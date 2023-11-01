@@ -1,0 +1,36 @@
+[project]
+name = "LifeGame-TUI"
+dynamic = ["version"]
+description = 'A simple python implementation of the lifegame.'
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Lingxuan Ye", email = "love@lingxuan.io" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+]
+dependencies = [
+  "click",
+  "numpy",
+  "scipy",
+]
+
+[project.urls]
+Source = "https://github.com/Lingxuan-Ye/lifegame/tree/main/python"
+
+[project.scripts]
+lifegame = "lifegame.cli:lifegame"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/lifegame/__about__.py"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
