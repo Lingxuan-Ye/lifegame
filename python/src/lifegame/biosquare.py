@@ -17,23 +17,21 @@ class BioSquare:
         self, nrows: int, ncols: int, world_creator: WorldCreator,
         lensfilter: LensFilter
     ) -> None:
-        self.__current = world_creator(nrows, ncols)
-        self.__next = self.__current.copy()
+        self.matrix = world_creator(nrows, ncols)
         self.creator = world_creator
         self.lensfilter = lensfilter
 
     def generate(self) -> Self:
         result = convolve2d(
-            self.__current, self.KERNEL, mode='same', boundary='wrap'
+            self.matrix, self.KERNEL, mode='same', boundary='wrap'
         )
-        self.__next[result == 3] = True
-        self.__next[(result != -6) & (result != -7) & (result < 0)] = False
-        self.__current[:] = self.__next
+        self.matrix[result == 3] = True
+        self.matrix[(result != -6) & (result != -7) & (result < 0)] = False
         return self
 
     def observe(self) -> Biased:
-        return self.lensfilter(self.__current)
+        return self.lensfilter(self.matrix)
 
     def reset(self) -> Self:
-        self.__current = self.creator(*self.__current.shape)
+        self.matrix = self.creator(*self.matrix.shape)
         return self
