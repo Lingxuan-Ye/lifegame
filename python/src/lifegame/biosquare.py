@@ -10,12 +10,14 @@ LensFilter = Callable[[Matrix], Biased]
 
 
 class BioSquare:
-
     KERNEL = np.array([[1, 1, 1], [1, -9, 1], [1, 1, 1]], dtype=np.int8)
 
     def __init__(
-        self, nrows: int, ncols: int, world_creator: WorldCreator,
-        lensfilter: LensFilter
+        self,
+        nrows: int,
+        ncols: int,
+        world_creator: WorldCreator,
+        lensfilter: LensFilter,
     ) -> None:
         self.matrix = world_creator(nrows, ncols)
         self.creator = world_creator
@@ -23,7 +25,10 @@ class BioSquare:
 
     def generate(self) -> Self:
         result = convolve2d(
-            self.matrix, self.KERNEL, mode='same', boundary='wrap'
+            self.matrix,
+            self.KERNEL,
+            mode="same",
+            boundary="wrap",
         )
         self.matrix[result == 3] = True
         self.matrix[(result != -6) & (result != -7) & (result < 0)] = False

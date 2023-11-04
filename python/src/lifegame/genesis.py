@@ -4,7 +4,6 @@ from .biosquare import Matrix
 
 
 class DicingGod:
-
     def __init__(self, seed: int | None = None) -> None:
         self.__rng = np.random.default_rng(seed)
         self.__seed = seed
