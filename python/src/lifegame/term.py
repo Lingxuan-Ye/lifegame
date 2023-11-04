@@ -2,50 +2,50 @@ from collections import UserString
 from typing import Any, Self
 
 ERASE = {
-    'screen': '\u001b[2J',
+    "screen": "\u001b[2J",
 }
 RESET = {
-    'all': '\u001b[0m',
-    'bold/dim': '\u001b[22m',
-    'italic': '\u001b[23m',
-    'underline': '\u001b[24m',
-    'blink': '\u001b[25m',
-    'reverse': '\u001b[27m',
-    'invisible ': '\u001b[28m',
-    'strikethrough': '\u001b[29m',
-    'foreground': '\u001b[39m',
-    'background': '\u001b[49m',
-    'cursor': '\u001b[H',
+    "all": "\u001b[0m",
+    "bold/dim": "\u001b[22m",
+    "italic": "\u001b[23m",
+    "underline": "\u001b[24m",
+    "blink": "\u001b[25m",
+    "reverse": "\u001b[27m",
+    "invisible ": "\u001b[28m",
+    "strikethrough": "\u001b[29m",
+    "foreground": "\u001b[39m",
+    "background": "\u001b[49m",
+    "cursor": "\u001b[H",
 }
 STYLE = {
-    'bold': '\u001b[1m',
-    'dim': '\u001b[2m',
-    'italic': '\u001b[3m',
-    'underline': '\u001b[4m',
-    'blink': '\u001b[5m',
-    'reverse': '\u001b[7m',
-    'invisible ': '\u001b[8m',
-    'strikethrough': '\u001b[9m',
+    "bold": "\u001b[1m",
+    "dim": "\u001b[2m",
+    "italic": "\u001b[3m",
+    "underline": "\u001b[4m",
+    "blink": "\u001b[5m",
+    "reverse": "\u001b[7m",
+    "invisible ": "\u001b[8m",
+    "strikethrough": "\u001b[9m",
 }
 FOREGROUND = {
-    'black': '\u001b[30m',
-    'red': '\u001b[31m',
-    'green': '\u001b[32m',
-    'yellow': '\u001b[33m',
-    'blue': '\u001b[34m',
-    'magenta': '\u001b[35m',
-    'cyan': '\u001b[36m',
-    'white': '\u001b[37m',
+    "black": "\u001b[30m",
+    "red": "\u001b[31m",
+    "green": "\u001b[32m",
+    "yellow": "\u001b[33m",
+    "blue": "\u001b[34m",
+    "magenta": "\u001b[35m",
+    "cyan": "\u001b[36m",
+    "white": "\u001b[37m",
 }
 BACKGROUND = {
-    'black': '\u001b[40m',
-    'red': '\u001b[41m',
-    'green': '\u001b[42m',
-    'yellow': '\u001b[43m',
-    'blue': '\u001b[44m',
-    'magenta': '\u001b[45m',
-    'cyan': '\u001b[46m',
-    'white': '\u001b[47m',
+    "black": "\u001b[40m",
+    "red": "\u001b[41m",
+    "green": "\u001b[42m",
+    "yellow": "\u001b[43m",
+    "blue": "\u001b[44m",
+    "magenta": "\u001b[45m",
+    "cyan": "\u001b[46m",
+    "white": "\u001b[47m",
 }
 
 
@@ -71,16 +71,23 @@ class TermString(UserString):
 
     def __add__(self, other: Any) -> Self:
         inst = super().__add__(other)
-        esc_len = self.esc_len
+        inst.esc_len = self.esc_len
         if isinstance(other, self.__class__):
-            esc_len += other.esc_len
-        inst.esc_len = esc_len
+            inst.esc_len += other.esc_len
+        return inst
+
+    def __radd__(self, other: Any) -> Self:
+        inst = super().__radd__(other)
+        inst.esc_len = self.esc_len
         return inst
 
     def __mul__(self, n: int) -> Self:
         inst = super().__mul__(n)
         inst.esc_len = self.esc_len * n if n > 0 else 0
         return inst
+
+    def __rmul__(self, n: int) -> Self:
+        return self.__mul__(n)
 
     def center(self, width: int, *args: Any) -> Self:
         inst = super().center(width + self.esc_len, *args)
