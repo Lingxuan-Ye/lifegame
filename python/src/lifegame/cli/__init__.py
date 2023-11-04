@@ -24,7 +24,7 @@ CONTEXT_SETTINGS = dict(
 @click.option('-c', '--ncols', type=click.IntRange(min=1), show_default=True, help='Number of columns.')
 @click.option('--fps-max', type=click.IntRange(min=1), show_default=True, help='Upper limit of fps.')
 @click.option('--cell', type=click.Choice(['binary', 'block', 'emoji', 'random-dye'], case_sensitive=False), help='Specifies cell style.')
-@click.option('--seed', type=int, show_default=True, help='World initialization seed.')
+@click.option('--seed', type=int, help='World initialization seed.')
 def lifegame(
     nrows: int,
     ncols: int,
