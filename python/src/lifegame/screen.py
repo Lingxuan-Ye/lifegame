@@ -23,8 +23,14 @@ class Screen:
         self,
         biosquare: BioSquare,
         *,
-        style: Style = Style(2, 1, 2, 20, 40),
-        fps_max: int = 24,
+        fps_max: float = 24.0,
+        style: Style = Style(
+            x_offset=2,
+            y_offset=1,
+            section_sep=2,
+            label_width=20,
+            value_width=40
+        ),
     ) -> None:
         self.iterno = 0
         self.timer = Timer()
