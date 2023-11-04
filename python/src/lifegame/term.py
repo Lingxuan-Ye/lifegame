@@ -49,34 +49,6 @@ BACKGROUND = {
 }
 
 
-def erase_screen() -> None:
-    print(ERASE['screen'] + RESET['cursor'], end='')
-
-
-def reset_cursor() -> None:
-    print(RESET['cursor'], end='')
-
-
-def set_bold(value: str) -> str:
-    return STYLE['bold'] + value + RESET['bold/dim']
-
-
-def set_dim(value: str) -> str:
-    return STYLE['dim'] + value + RESET['bold/dim']
-
-
-def set_bold_dim(value: str) -> str:
-    return STYLE['bold'] + STYLE['dim'] + value + RESET['bold/dim']
-
-
-def set_color(value: str, color: str) -> str:
-    return FOREGROUND[color] + value + RESET['foreground']
-
-
-def set_color_bg(value: str, color: str) -> str:
-    return BACKGROUND[color] + value + RESET['background']
-
-
 class TermString(UserString):
     """
     Inherited methods that return instances of this class (`Self`)
@@ -125,5 +97,40 @@ class TermString(UserString):
         inst.esc_len = self.esc_len
         return inst
 
-    def to_str(self) -> str:
-        return str(self)
+
+def erase_screen() -> None:
+    print(ERASE["screen"] + RESET["cursor"], end="")
+
+
+def reset_cursor() -> None:
+    print(RESET["cursor"], end="")
+
+
+def get_tstr(escseq_dict: dict[str, str], key: str) -> TermString:
+    escseq = escseq_dict[key]
+    return TermString(escseq, esc_len=len(escseq))
+
+
+def set_bold(value: str | TermString) -> TermString:
+    return get_tstr(STYLE, "bold") + value + get_tstr(RESET, "bold/dim")
+
+
+def set_dim(value: str | TermString) -> TermString:
+    return get_tstr(STYLE, "dim") + value + get_tstr(RESET, "bold/dim")
+
+
+def set_bold_dim(value: str | TermString) -> TermString:
+    return (
+        get_tstr(STYLE, "bold")
+        + get_tstr(STYLE, "dim")
+        + value
+        + get_tstr(RESET, "bold/dim")
+    )
+
+
+def set_color(value: str | TermString, color: str) -> TermString:
+    return get_tstr(FOREGROUND, color) + value + get_tstr(RESET, "foreground")
+
+
+def set_color_bg(value: str | TermString, color: str) -> TermString:
+    return get_tstr(BACKGROUND, color) + value + get_tstr(RESET, "background")
