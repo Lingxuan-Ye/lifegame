@@ -30,10 +30,20 @@ def blockify(matrix: Matrix) -> Biased:
     return _lensfilter(matrix, sym_alive, sym_dead)
 
 
-def emojify(matrix: Matrix) -> Biased:
-    sym_alive = choice('😄😁😆🤣😊🥰😍😘😚🤗🤭😋🤤🥵🥳😳😤')
-    sym_dead = choice('😅😇🤪😴🤢🤮🥶😵🤯😨😰😭😱😡😠🤬😈👿🤡👻')
-    return _lensfilter(matrix, sym_alive, sym_dead)
+class Emojify:
+
+    def __init__(self, sym_alive: str, sym_dead: str) -> None:
+        self.sym_alive = sym_alive
+        self.sym_dead = sym_dead
+
+    def __call__(self, matrix: Matrix) -> Biased:
+        return _lensfilter(matrix, self.sym_alive, self.sym_dead)
+
+    @classmethod
+    def random(cls) -> Self:
+        sym_alive = choice('😄😁😆🤣😊🥰😍😘😚🤗🤭😋🤤🥳😳😤')
+        sym_dead = choice('🤢🥶🥵😡🤬😈👿🤡👻')
+        return cls(sym_alive, sym_dead)
 
 
 class Dye:
