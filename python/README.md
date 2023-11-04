@@ -20,15 +20,33 @@ pip install lifegame-tui
 
 ## Usage
 
-Run
+Create a lifegame with $80 \times 100$ cells (please resize your terminal window in case of display glitches):
 
 ```console
-lifegame --help  # not `LifeGame-TUI`
+lifegame --nrows 80 --ncols 100
 ```
 
-for more infomation.
+Classic *Matrix* style:
 
-Please resize your terminal window in case of display glitches.
+```console
+lifegame --cell bit
+```
+
+Emojify the world:
+
+```console
+lifegame --cell emoji
+```
+
+Share your game:
+
+```console
+# save
+lifegame --hide-stats --iteration-max 1000 > some_file
+
+# load
+cat some_file || type fome_file
+```
 
 ## License
 
