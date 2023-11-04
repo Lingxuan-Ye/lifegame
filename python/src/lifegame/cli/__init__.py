@@ -13,6 +13,7 @@ CONTEXT_SETTINGS = dict(
         "cell": "dye",
         "color_alive": "white",
         "color_dead": "green",
+        "iteration_max": -1,
         "fps_max": 24.0,
         "show_stats": True,
         "seed": None,
@@ -66,7 +67,7 @@ ColorChoice = click.Choice(
     "--cell",
     type=CellChoice,
     show_default=True,
-    help="Specifies cell style.",
+    help="Specify cell style.",
 )
 @click.option(
     "-A",
@@ -81,9 +82,18 @@ ColorChoice = click.Choice(
     help="Color for dead Cells. Omit if `--cell` is not set to 'dye'.",
 )
 @click.option(
+    "-i",
+    "--iteration-max",
+    metavar="",
+    type=int,
+    show_default=True,
+    help="Set maximum iterations. Run forever if negative.",
+)
+@click.option(
     "--fps-max",
     metavar="",
     type=click.FloatRange(min=0.0, min_open=True),
+    help="Set maximum fps.",
 )
 @click.option(
     "--show-stats/--hide-stats",
@@ -107,10 +117,16 @@ def lifegame(
     cell: str,
     color_alive: str,
     color_dead: str,
+    iteration_max: int,
     fps_max: int,
     show_stats: bool,
     seed: int,
 ):
+    """
+    \b
+    A simple implementation of the classic cellular automaton,
+    Conway's Game of Life.
+    """
     filter: LensFilter
     match cell:
         case "bit":
@@ -124,5 +140,10 @@ def lifegame(
         case "random-dye":
             filter = lensfilter.Dye.random()
     biosquare = BioSquare(nrows, ncols, genesis.DicingGod(seed), filter)
-    screen = Screen(biosquare, fps_max=fps_max, show_stats=show_stats)
+    screen = Screen(
+        biosquare,
+        iterno_max=iteration_max,
+        fps_max=fps_max,
+        show_stats=show_stats,
+    )
     screen.play()

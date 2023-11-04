@@ -21,6 +21,7 @@ class Screen:
         self,
         biosquare: BioSquare,
         *,
+        iterno_max: int = -1,
         fps_max: float = 24.0,
         show_stats: bool = True,
         style: Style = Style(
@@ -31,9 +32,10 @@ class Screen:
             value_width=40,
         ),
     ) -> None:
-        self.iterno = 0
-        self.timer = Timer()
         self.biosquare = biosquare
+        self.timer = Timer()
+        self.iterno = 0
+        self.iterno_max = iterno_max
         self.fps_max = fps_max
         self.show_stats = show_stats
         self.style = style
@@ -107,7 +109,7 @@ class Screen:
         erase_screen()
         self.timer.reset()
 
-        while not recv_sigint:
+        while not recv_sigint and not 0 <= self.iterno_max <= self.iterno:
             start = self.timer.check()
             self.display()
             self.biosquare.generate()
