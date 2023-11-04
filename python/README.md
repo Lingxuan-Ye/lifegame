@@ -28,6 +28,8 @@ lifegame --help  # not `LifeGame-TUI`
 
 for more infomation.
 
+Please resize your terminal window in case of display glitches.
+
 ## License
 
 `LifeGame-TUI` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
