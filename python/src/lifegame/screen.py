@@ -34,7 +34,11 @@ class Screen:
 
     @property
     def fps(self) -> float:
-        return self.timer.NS_PER_S / self.timer.check_delta()
+        try:
+            fps = self.timer.NS_PER_S / self.timer.check_delta()
+        except ZeroDivisionError:
+            fps = float('inf')
+        return fps
 
     @property
     def seperator(self) -> Rows:
