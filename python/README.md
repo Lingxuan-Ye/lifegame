@@ -7,14 +7,26 @@
 
 **Table of Contents**
 
-- [Installation](#installation)
-- [License](#license)
+- [LifeGame-TUI](#lifegame-tui)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [License](#license)
 
 ## Installation
 
 ```console
 pip install lifegame-tui
 ```
+
+## Usage
+
+Run
+
+```console
+lifegame --help  # not `LifeGame-TUI`
+```
+
+for more infomation.
 
 ## License
 
