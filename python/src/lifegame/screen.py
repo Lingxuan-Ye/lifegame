@@ -9,7 +9,6 @@ Rows = Generator[str, None, None]
 
 
 class Style(NamedTuple):
-
     x_offset: int
     y_offset: int
     section_sep: int
@@ -18,76 +17,77 @@ class Style(NamedTuple):
 
 
 class Screen:
-
     def __init__(
         self,
         biosquare: BioSquare,
         *,
         fps_max: float = 24.0,
+        show_stats: bool = True,
         style: Style = Style(
             x_offset=2,
             y_offset=1,
             section_sep=2,
             label_width=20,
-            value_width=40
+            value_width=40,
         ),
     ) -> None:
         self.iterno = 0
         self.timer = Timer()
         self.biosquare = biosquare
-        self.style = style
         self.fps_max = fps_max
+        self.show_stats = show_stats
+        self.style = style
 
     @property
     def fps(self) -> float:
         try:
             fps = self.timer.NS_PER_S / self.timer.check_delta()
         except ZeroDivisionError:
-            fps = float('inf')
+            fps = float("inf")
         return fps
 
     @property
     def seperator(self) -> Rows:
         for _ in range(self.style.section_sep):
-            yield ''
+            yield ""
 
     @property
     def exit_message(self) -> Rows:
-        yield set_color(set_bold('GAME OVER'), 'green')
+        yield str(set_color(set_bold("GAME OVER"), "green"))
 
     def _meas_fmt(self, label: Any, value: Any) -> str:
-        label_t = TermString(set_bold(str(label)), esc_len=9)
-        label_s = label_t.ljust(self.style.label_width).to_str()
+        label_s = str(set_bold(str(label)).ljust(self.style.label_width))
         if isinstance(value, float):
-            value = f'{value:.2f}'
-        value_t = TermString(value)
-        value_s = value_t.rjust(self.style.value_width).to_str()
+            value = f"{value:.2f}"
+        value_s = str(TermString(value).rjust(self.style.value_width))
         return label_s + value_s
 
     def observe(self) -> Rows:
-        yield self._meas_fmt('Iteration', self.iterno)
-        yield self._meas_fmt('FPS', self.fps)
-        yield self._meas_fmt('Runtime', self.timer.check_fmt(record=True))
+        yield self._meas_fmt("Iteration", self.iterno)
+        yield self._meas_fmt("FPS", self.fps)
+        yield self._meas_fmt("Runtime", self.timer.check_fmt(record=True))
 
     def render(self, is_last_frame: bool = False) -> Rows:
         for row in self.biosquare.observe():
             yield row
-        for row in self.seperator:
-            yield row
-        for row in self.observe():
-            yield row
-        if not is_last_frame:
-            return
-        for row in self.seperator:
-            yield row
-        for row in self.exit_message:
-            yield row
+
+        if self.show_stats:
+            for row in self.seperator:
+                yield row
+            for row in self.observe():
+                yield row
+
+        if is_last_frame:
+            for row in self.seperator:
+                yield row
+            for row in self.exit_message:
+                yield row
 
     def offset(self, frame: Rows) -> Rows:
         for _ in range(self.style.y_offset):
-            yield ''
+            yield ""
         for row in frame:
-            yield ' ' * self.style.x_offset + row
+            yield " " * self.style.x_offset + row
 
     def display(self, is_last_frame: bool = False) -> None:
         reset_cursor()
