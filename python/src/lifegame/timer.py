@@ -6,12 +6,11 @@ from .term import TermString, set_dim
 
 
 class Timer:
-
     NS_PER_S = 10**9
     NS_PER_MS = 10**6
     NS_PER_MUS = 10**3
 
-    FMT_SEP = ' - '
+    FMT_SEP = " - "
 
     def __init__(self, records_capacity: int = 100_000) -> None:
         self.__timezero = time.time_ns()
@@ -29,7 +28,7 @@ class Timer:
 
     @staticmethod
     def _style(value: int, unit: str) -> TermString:
-        return TermString(f'{value:>3} {set_dim(unit)}', esc_len=9)
+        return f"{value:>3} " + set_dim(unit)
 
     @classmethod
     def format(cls, ns: int) -> TermString:
@@ -37,10 +36,13 @@ class Timer:
         ms, ns = divmod(ns, cls.NS_PER_MS)
         mus, ns = divmod(ns, cls.NS_PER_MUS)
         return (
-            cls._style(s, 's') + cls.FMT_SEP +
-            cls._style(ms, 'ms') + cls.FMT_SEP +
-            cls._style(mus, 'μs') + cls.FMT_SEP +
-            cls._style(ns, 'ns')
+            cls._style(s, "s")
+            + cls.FMT_SEP
+            + cls._style(ms, "ms")
+            + cls.FMT_SEP
+            + cls._style(mus, "μs")
+            + cls.FMT_SEP
+            + cls._style(ns, "ns")
         )
 
     def check_fmt(self, record: bool = False) -> TermString:
