@@ -1,4 +1,5 @@
-from random import choice, sample
+import random
+from abc import ABC, abstractmethod
 from typing import Self
 
 import numpy as np
@@ -7,63 +8,72 @@ from .biosquare import Biased, Matrix
 from .term import BACKGROUND, RESET, set_bold, set_bold_dim, set_color
 
 
-def _lensfilter(matrix: Matrix, sym_alive: str, sym_dead: str) -> Biased:
-    film = np.where(matrix, sym_alive, sym_dead)
-    return (''.join(row) for row in film)
-
-
-def digitize(matrix: Matrix) -> Biased:
+class _LensFilter(ABC):
     """
-    Outputs full-width digits.
+    Using attributes may slightly reduce string instantiation overhead,
+    or may not.
     """
-    sym_alive = set_bold('１')
-    sym_dead = set_bold_dim('０')
-    return (
-        set_color(row, 'green')
-        for row in _lensfilter(matrix, sym_alive, sym_dead)
-    )
+    sym_alive: str
+    sym_dead: str
+
+    def _lensfilter(self, matrix: Matrix) -> Biased:
+        film = np.where(matrix, self.sym_alive, self.sym_dead)
+        return ("".join(row) for row in film)
+
+    @abstractmethod
+    def __call__(self, matrix: Matrix) -> Biased:
+        pass
 
 
-def blockify(matrix: Matrix) -> Biased:
-    sym_alive = '██'
-    sym_dead = '  '
-    return _lensfilter(matrix, sym_alive, sym_dead)
+class Digitize(_LensFilter):
+    """
+    Outputs full-width binary digits.
+    """
+
+    sym_alive = str(set_bold("１"))
+    sym_dead = str(set_bold_dim("０"))
+
+    def __call__(self, matrix: Matrix) -> Biased:
+        for row in self._lensfilter(matrix):
+            yield str(set_color(row, "green"))
 
 
-class Emojify:
+class Blockify(_LensFilter):
+    sym_alive = "██"
+    sym_dead = "  "
 
+    def __call__(self, matrix: Matrix) -> Biased:
+        return self._lensfilter(matrix)
+
+
+class Emojify(_LensFilter):
     def __init__(self, sym_alive: str, sym_dead: str) -> None:
         self.sym_alive = sym_alive
         self.sym_dead = sym_dead
 
     def __call__(self, matrix: Matrix) -> Biased:
-        return _lensfilter(matrix, self.sym_alive, self.sym_dead)
+        return self._lensfilter(matrix)
 
     @classmethod
-    def random(cls) -> Self:
-        sym_alive = choice('😄😁😆🤣😊🥰😍😘😚🤗🤭😋🤤🥳😳😤')
-        sym_dead = choice('🤢🥶🥵😡🤬😈👿🤡👻')
+    def random(cls, seed: int | None = None) -> Self:
+        random.seed(seed)
+        sym_alive = random.choice("😄😁😆🤣😊🥰😍😘😚🤗🤭😋🤤🥳😳😤")
+        sym_dead = random.choice("🤢🥶🥵😡🤬😈👿🤡👻")
         return cls(sym_alive, sym_dead)
 
 
-class Dye:
-
-    FSPACE = '　'
+class Dye(_LensFilter):
+    FSPACE = "　"
 
     def __init__(self, color_alive: str, color_dead: str) -> None:
-        self.sym_alive = BACKGROUND.get(
-            color_alive, BACKGROUND['white']
-        ) + self.FSPACE
-        self.sym_dead = BACKGROUND.get(
-            color_dead, BACKGROUND['black']
-        ) + self.FSPACE
+        self.sym_alive = BACKGROUND[color_alive] + self.FSPACE
+        self.sym_dead = BACKGROUND[color_dead] + self.FSPACE
 
     def __call__(self, matrix: Matrix) -> Biased:
-        return (
-            row + RESET['all']
-            for row in _lensfilter(matrix, self.sym_alive, self.sym_dead)
-        )
+        for row in self._lensfilter(matrix):
+            yield row + RESET["all"]
 
     @classmethod
-    def random(cls) -> Self:
-        return cls(*sample(list(BACKGROUND), 2))
+    def random(cls, seed: int | None = None) -> Self:
+        random.seed(seed)
+        return cls(*random.sample(list(BACKGROUND), 2))
