@@ -9,7 +9,3 @@ edition = "2021"
 
 [dev-dependencies]
 criterion = "0.3"
-
-[[bench]]
-name = "strides_generation"
-harness = false
