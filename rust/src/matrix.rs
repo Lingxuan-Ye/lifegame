@@ -1,33 +1,41 @@
 use std::ops::{Index, IndexMut};
 
-use crate::ndarray::NDArray;
-
-pub struct Matrix<T: Clone + Default>(NDArray<T>);
+pub struct Matrix<T: Clone + Default> {
+    data: Vec<T>,
+    shape: (usize, usize),
+}
 
 impl<T: Clone + Default> Matrix<T> {
     pub fn new(nrows: usize, ncols: usize) -> Self {
-        Matrix(NDArray::new(&[nrows, ncols]))
+        let size: usize = nrows * ncols;
+        Matrix {
+            data: vec![T::default(); size],
+            shape: (nrows, ncols),
+        }
     }
-    pub fn shape(&self) -> &[usize] {
-        self.0.shape()
-    }
-    pub fn nrows(&self) -> usize {
-        self.shape()[0]
-    }
-    pub fn ncols(&self) -> usize {
-        self.shape()[1]
+    pub fn shape(&self) -> (usize, usize) {
+        self.shape
     }
 }
 
-impl<T: Clone + Default> Index<&[usize]> for Matrix<T> {
+impl<T: Clone + Default> Matrix<T> {
+    fn flat_index(&self, index: (usize, usize)) -> usize {
+        assert!(index.0 < self.shape.0, "index 0 out of bound.");
+        assert!(index.1 < self.shape.1, "index 1 out of bound.");
+        index.0 * self.shape.1 + index.1
+    }
+}
+
+impl<T: Clone + Default> Index<(usize, usize)> for Matrix<T> {
     type Output = T;
-    fn index(&self, index: &[usize]) -> &Self::Output {
-        &self.0[index]
+    fn index(&self, index: (usize, usize)) -> &Self::Output {
+        &self.data[self.flat_index(index)]
     }
 }
 
-impl<T: Clone + Default> IndexMut<&[usize]> for Matrix<T> {
-    fn index_mut(&mut self, index: &[usize]) -> &mut Self::Output {
-        &mut self.0[index]
+impl<T: Clone + Default> IndexMut<(usize, usize)> for Matrix<T> {
+    fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
+        let flattened = self.flat_index(index);
+        &mut self.data[flattened]
     }
 }
