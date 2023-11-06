@@ -33,6 +33,10 @@ impl<T: Clone + Default> NDArray<T> {
         self.shape.len()
     }
     fn get_flat_index(&self, index: &[usize]) -> usize {
+        assert!(
+            index.len() == self.shape.len(),
+            "number of dimensions mismatches."
+        );
         let flat_index: usize = index
             .iter()
             .zip(self.shape.iter())
