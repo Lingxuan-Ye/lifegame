@@ -37,7 +37,7 @@ impl<T: Clone + Default> NDArray<T> {
             index.len() == self.shape.len(),
             "number of dimensions mismatches."
         );
-        let flat_index: usize = index
+        let flattened: usize = index
             .iter()
             .zip(self.shape.iter())
             .map(|(&i, &dimsize)| {
@@ -47,7 +47,7 @@ impl<T: Clone + Default> NDArray<T> {
             .zip(self.strides.iter())
             .map(|(x, &y)| x * y)
             .sum();
-        flat_index
+        flattened
     }
 }
 
@@ -60,7 +60,7 @@ impl<T: Clone + Default> Index<&[usize]> for NDArray<T> {
 
 impl<T: Clone + Default> IndexMut<&[usize]> for NDArray<T> {
     fn index_mut(&mut self, index: &[usize]) -> &mut Self::Output {
-        let flat_index = self.get_flat_index(index);
+        let flattened = self.get_flat_index(index);
         &mut self.data[flat_index]
     }
 }
