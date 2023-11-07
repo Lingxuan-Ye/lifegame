@@ -1,6 +1,3 @@
-use rayon::prelude::*;
-use std::sync::{Arc, Mutex};
-
 mod display;
 mod index;
 
@@ -32,6 +29,12 @@ impl<T: Clone + Default> Matrix<T> {
     }
     pub fn can_hold<U: Clone + Default>(&self, other: &Matrix<U>) -> bool {
         self.nrows() >= other.nrows() && self.ncols() >= other.ncols()
+    }
+    pub fn overwrite(&self, other: &mut Matrix<T>) {
+        assert!(other.can_hold(self));
+        for (index, value) in self.data.iter().enumerate() {
+            other.data[index] = value.clone()
+        }
     }
     pub fn from_slice(slice: &[T], shape: (usize, usize)) -> Self {
         let size = shape.0 * shape.1;
