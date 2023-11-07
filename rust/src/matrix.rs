@@ -1,7 +1,10 @@
+use rayon::prelude::*;
+use std::sync::{Arc, Mutex};
+
 mod display;
 mod index;
 
-#[derive(PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Matrix<T: Clone + Default> {
     data: Vec<T>,
     shape: (usize, usize),
@@ -15,14 +18,26 @@ impl<T: Clone + Default> Matrix<T> {
             shape: (nrows, ncols),
         }
     }
+    pub fn shape(&self) -> (usize, usize) {
+        self.shape
+    }
+    pub fn nrows(&self) -> usize {
+        self.shape.0
+    }
+    pub fn ncols(&self) -> usize {
+        self.shape.1
+    }
+    pub fn size(&self) -> usize {
+        self.shape.0 * self.shape.1
+    }
+    pub fn can_hold<U: Clone + Default>(&self, other: &Matrix<U>) -> bool {
+        self.nrows() >= other.nrows() && self.ncols() >= other.ncols()
+    }
     pub fn from_slice(slice: &[T], shape: (usize, usize)) -> Self {
         let size = shape.0 * shape.1;
         let mut data = Vec::from(slice);
         data.resize(size, T::default());
         Self { data, shape }
-    }
-    pub fn shape(&self) -> (usize, usize) {
-        self.shape
     }
 }
 
@@ -36,7 +51,7 @@ impl<T: Clone + Default> Matrix<T> {
 /// # Examples
 ///
 /// ```
-/// use lifegame::{matrix, matrix::{Matrix}};
+/// use lifegame::{matrix, matrix::Matrix};
 ///
 /// matrix![[0, 1, 2, 3, 4], [5, 6, 7, 8, 9],];
 /// let foo: Matrix<i32> = matrix![];
