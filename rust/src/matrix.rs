@@ -29,7 +29,7 @@ impl<T: Clone + Default> Matrix<T> {
         self.shape.0 * self.shape.1
     }
     pub fn can_hold<U: Clone + Default>(&self, other: &Matrix<U>) -> bool {
-        self.nrows() >= other.nrows() && self.ncols() >= other.ncols()
+        self.shape.0 >= other.shape.0 && self.shape.1 >= other.shape.1
     }
     pub fn overwrite(&self, other: &mut Matrix<T>) {
         assert!(other.can_hold(self));
@@ -58,9 +58,14 @@ impl<T: Clone + Default> Matrix<T> {
 /// use lifegame::{matrix, matrix::Matrix};
 ///
 /// matrix![[0, 1, 2, 3, 4], [5, 6, 7, 8, 9],];
+///
 /// let foo: Matrix<i32> = matrix![];
+/// assert!(foo.shape() == (0, 0));
+/// assert!(foo.size() == 0);
+///
 /// let bar: Matrix<u8> = matrix![[0, 1, 2], [3, 4, 5]];
 /// assert!(bar.shape() == (2, 3));
+/// assert!(bar.size() == 6);
 /// ```
 #[macro_export]
 macro_rules! matrix {
