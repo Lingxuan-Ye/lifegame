@@ -1,5 +1,6 @@
 mod display;
 mod index;
+mod iter;
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct Matrix<T: Clone + Default> {
