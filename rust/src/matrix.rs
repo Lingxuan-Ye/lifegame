@@ -3,7 +3,7 @@ mod index;
 mod iter;
 
 #[derive(Clone, PartialEq, Eq)]
-pub struct Matrix<T: Clone + Default> {
+pub struct Matrix<T: Clone + Default = i32> {
     data: Vec<T>,
     shape: (usize, usize),
 }
