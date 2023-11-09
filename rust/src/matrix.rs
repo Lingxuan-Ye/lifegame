@@ -10,7 +10,7 @@ pub struct Matrix<T: Clone + Default = i32> {
 
 impl<T: Clone + Default> Matrix<T> {
     pub fn new(nrows: usize, ncols: usize) -> Self {
-        let size: usize = nrows * ncols;
+        let size = Self::cal_size(nrows, ncols);
         Self {
             data: vec![T::default(); size],
             shape: (nrows, ncols),
@@ -25,8 +25,11 @@ impl<T: Clone + Default> Matrix<T> {
     pub fn ncols(&self) -> usize {
         self.shape.1
     }
+    fn cal_size(nrows: usize, ncols: usize) -> usize {
+        nrows.checked_mul(ncols).expect("Size overflows.")
+    }
     pub fn size(&self) -> usize {
-        self.shape.0 * self.shape.1
+        Self::cal_size(self.shape.0, self.shape.1)
     }
     pub fn can_hold<U: Clone + Default>(&self, other: &Matrix<U>) -> bool {
         self.shape.0 >= other.shape.0 && self.shape.1 >= other.shape.1
@@ -69,8 +72,7 @@ impl<T: Clone + Default> Matrix<T> {
 /// ```
 #[macro_export]
 macro_rules! matrix {
-    [ $( [ $($x:expr),* $(,)? ] ),* $(,)? ] => {
-        {
+    [ $( [ $($x:expr),* $(,)? ] ),* $(,)? ] => {{
         #[allow(unused_mut)]
         let mut data = std::vec::Vec::new();
         #[allow(unused_mut)]
