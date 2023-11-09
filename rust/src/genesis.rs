@@ -1,4 +1,7 @@
-use crate::{biosquare::WorldCreator, matrix::Matrix};
+use crate::{
+    biosquare::{Generation, WorldCreator},
+    matrix::Matrix,
+};
 use rand::Rng;
 use rand_chacha::{rand_core::SeedableRng, ChaCha8Rng};
 
@@ -17,10 +20,10 @@ impl DicingGod {
 }
 
 impl WorldCreator for DicingGod {
-    fn create(&self, nrows: usize, ncols: usize) -> Matrix<i8> {
+    fn create(&self, nrows: usize, ncols: usize) -> Generation {
         let mut rng = ChaCha8Rng::seed_from_u64(self.seed);
-        let data: Vec<i8> = (0..nrows * ncols)
-            .map(|_| rng.gen_bool(self.population_density) as i8)
+        let data: Vec<bool> = (0..nrows * ncols)
+            .map(|_| rng.gen_bool(self.population_density))
             .collect();
         Matrix::from_slice(&data, (nrows, ncols))
     }
