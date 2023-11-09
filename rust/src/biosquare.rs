@@ -1,8 +1,6 @@
-use std::sync::Mutex;
-
-use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-
 use crate::matrix::Matrix;
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+use std::sync::Mutex;
 
 type Biased = Box<dyn Iterator<Item = String>>;
 type WorldCreator = fn(usize, usize) -> Matrix<i32>;
@@ -31,7 +29,7 @@ impl BioSquare {
             lensfilter,
         }
     }
-    pub fn generate(&mut self) {
+    pub fn generate(&mut self) -> &mut Self {
         (0..self.current.size()).into_par_iter().for_each(|i| {
             let (nrows, ncols) = self.current.shape();
             let row = i / ncols;
@@ -57,6 +55,7 @@ impl BioSquare {
             }
         });
         self.next.lock().unwrap().overwrite(&mut self.current);
+        self
     }
     pub fn observe(&self) -> Biased {
         (self.lensfilter)(&self.current)
