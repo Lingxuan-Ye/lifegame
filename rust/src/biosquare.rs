@@ -2,25 +2,31 @@ use crate::matrix::Matrix;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use std::sync::Mutex;
 
-type Biased = Box<dyn Iterator<Item = String>>;
-type WorldCreator = fn(usize, usize) -> Matrix<i32>;
-type LensFilter = fn(&Matrix<i32>) -> Biased;
+pub trait WorldCreator {
+    fn create(&self, nrows: usize, ncols: usize) -> Matrix<i8>;
+}
+
+pub type Biased = Box<dyn Iterator<Item = String>>;
+
+pub trait LensFilter {
+    fn observe(&self, matrix: &Matrix<i8>) -> Biased;
+}
 
 pub struct BioSquare {
-    current: Matrix<i32>,
-    next: Mutex<Matrix<i32>>,
-    creator: WorldCreator,
-    lensfilter: LensFilter,
+    current: Matrix<i8>,
+    next: Mutex<Matrix<i8>>,
+    pub creator: Box<dyn WorldCreator>,
+    pub lensfilter: Box<dyn LensFilter>,
 }
 
 impl BioSquare {
     pub fn new(
         nrows: usize,
         ncols: usize,
-        world_creator: WorldCreator,
-        lensfilter: LensFilter,
+        world_creator: Box<dyn WorldCreator>,
+        lensfilter: Box<dyn LensFilter>,
     ) -> Self {
-        let current = world_creator(nrows, ncols);
+        let current = world_creator.create(nrows, ncols);
         let next = Mutex::new(current.clone());
         Self {
             current,
@@ -58,11 +64,11 @@ impl BioSquare {
         self
     }
     pub fn observe(&self) -> Biased {
-        (self.lensfilter)(&self.current)
+        self.lensfilter.observe(&self.current)
     }
     pub fn reset(&mut self) -> &mut Self {
         let (nrows, ncols) = self.current.shape();
-        self.current = (self.creator)(nrows, ncols);
+        self.current = self.creator.create(nrows, ncols);
         self
     }
 }
