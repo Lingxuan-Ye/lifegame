@@ -13,7 +13,9 @@ use std::cmp::max;
 
 trait Project {
     fn sym_alive(&self) -> &str;
+
     fn sym_dead(&self) -> &str;
+
     fn project<'a>(&'a self, gen: &'a Generation) -> Biased<'a> {
         let line_len = max(self.sym_alive().len(), self.sym_dead().len()) * gen.ncols();
         return Box::new(gen.iterrows().map(move |row| {

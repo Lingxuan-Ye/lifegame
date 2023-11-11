@@ -36,23 +36,29 @@ impl BioSquare {
             lensfilter,
         }
     }
+
     pub fn shape(&self) -> (usize, usize) {
         self.current.shape()
     }
+
     pub fn nrows(&self) -> usize {
         self.current.nrows()
     }
+
     pub fn ncols(&self) -> usize {
         self.current.ncols()
     }
+
     pub fn size(&self) -> usize {
         self.current.size()
     }
+
     pub fn generate(&mut self) -> &mut Self {
         (0..self.current.size()).into_par_iter().for_each(|i| {
             let (nrows, ncols) = self.current.shape();
             let row = i / ncols;
             let col = i % ncols;
+
             let mut count = 0;
             for row_offet in -1..=1 {
                 for col_offset in -1..=1 {
@@ -67,6 +73,7 @@ impl BioSquare {
                     }
                 }
             }
+
             let state = self.current[(row, col)];
             let mut next_generation = self.next.lock().unwrap();
             match (state, count) {
@@ -78,9 +85,11 @@ impl BioSquare {
         self.next.lock().unwrap().overwrite(&mut self.current);
         self
     }
+
     pub fn observe(&self) -> Biased {
         self.lensfilter.observe(&self.current)
     }
+
     pub fn reset(&mut self) -> &mut Self {
         let (nrows, ncols) = self.current.shape();
         self.current = self.creator.create(nrows, ncols);

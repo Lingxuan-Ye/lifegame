@@ -16,30 +16,38 @@ impl<T: Clone + Default> Matrix<T> {
             shape: (nrows, ncols),
         }
     }
+
     pub fn shape(&self) -> (usize, usize) {
         self.shape
     }
+
     pub fn nrows(&self) -> usize {
         self.shape.0
     }
+
     pub fn ncols(&self) -> usize {
         self.shape.1
     }
+
     fn cal_size(nrows: usize, ncols: usize) -> usize {
         nrows.checked_mul(ncols).expect("Size overflows.")
     }
+
     pub fn size(&self) -> usize {
         Self::cal_size(self.shape.0, self.shape.1)
     }
+
     pub fn can_hold<U: Clone + Default>(&self, other: &Matrix<U>) -> bool {
         self.shape.0 >= other.shape.0 && self.shape.1 >= other.shape.1
     }
+
     pub fn overwrite(&self, other: &mut Matrix<T>) {
         assert!(other.can_hold(self));
         for (index, value) in self.data.iter().enumerate() {
             other.data[index] = value.clone()
         }
     }
+
     pub fn from_slice(slice: &[T], shape: (usize, usize)) -> Self {
         let size = shape.0 * shape.1;
         let mut data = Vec::from(slice);

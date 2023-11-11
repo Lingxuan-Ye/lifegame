@@ -20,25 +20,30 @@ impl TermString {
             esc_len: 0,
         }
     }
+
     pub fn from_escseq(escseq: &str) -> Self {
         TermString {
             data: escseq.to_string(),
             esc_len: escseq.len(),
         }
     }
+
     pub fn len(&self) -> usize {
         self.data.len() - self.esc_len
     }
+
     pub fn center(mut self, mut width: usize) -> Self {
         width += self.esc_len;
         self.data = format!("{:^width$}", self.data);
         self
     }
+
     pub fn ljust(mut self, mut width: usize) -> Self {
         width += self.esc_len;
         self.data = format!("{:<width$}", self.data);
         self
     }
+    
     pub fn rjust(mut self, mut width: usize) -> Self {
         width += self.esc_len;
         self.data = format!("{:>width$}", self.data);

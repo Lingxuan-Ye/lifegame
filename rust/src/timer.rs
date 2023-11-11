@@ -14,12 +14,15 @@ impl<T> LimitedDeque<T> {
             max_len,
         }
     }
+
     fn back(&self) -> Option<&T> {
         self.data.back()
     }
+
     fn clear(&mut self) {
         self.data.clear()
     }
+
     fn push_back(&mut self, value: T) -> Option<T> {
         self.data.push_back(value);
         if self.data.len() > self.max_len {

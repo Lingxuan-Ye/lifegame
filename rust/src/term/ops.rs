@@ -68,7 +68,6 @@ mod deref {
 
     impl Deref for TermString {
         type Target = str;
-
         fn deref(&self) -> &Self::Target {
             &self.data
         }

@@ -25,6 +25,7 @@ impl<T: Clone + Default + Display> Display for Matrix<T> {
             rows.push(format!("    [{}],", items.join(", ")));
             items.clear()
         }
+
         write!(f, "[\n{}\n]", rows.join("\n"))
     }
 }
