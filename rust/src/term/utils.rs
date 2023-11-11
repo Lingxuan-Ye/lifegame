@@ -16,26 +16,26 @@ fn get_tstr(cat: &str, key: &str) -> TermString {
 }
 
 #[inline]
-pub fn set_bold(value: String) -> TermString {
+pub fn set_bold(value: &str) -> TermString {
     get_tstr("style", "bold") + value + get_tstr("reset", "bold/dim")
 }
 
 #[inline]
-pub fn set_dim(value: String) -> TermString {
+pub fn set_dim(value: &str) -> TermString {
     get_tstr("style", "dim") + value + get_tstr("reset", "bold/dim")
 }
 
 #[inline]
-pub fn set_bold_dim(value: String) -> TermString {
+pub fn set_bold_dim(value: &str) -> TermString {
     get_tstr("style", "bold") + get_tstr("style", "dim") + value + get_tstr("reset", "bold/dim")
 }
 
 #[inline]
-pub fn set_color(value: String, color: &str) -> TermString {
+pub fn set_color(value: &str, color: &str) -> TermString {
     get_tstr("foreground", color) + value + get_tstr("reset", "foreground")
 }
 
 #[inline]
-pub fn set_color_bg(value: String, color: &str) -> TermString {
+pub fn set_color_bg(value: &str, color: &str) -> TermString {
     get_tstr("background", color) + value + get_tstr("reset", "background")
 }
