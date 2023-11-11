@@ -226,9 +226,12 @@ name = "lifegame"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "once_cell",
  "rand",
  "rand_chacha",
  "rayon",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
