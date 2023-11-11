@@ -36,6 +36,18 @@ impl BioSquare {
             lensfilter,
         }
     }
+    pub fn shape(&self) -> (usize, usize) {
+        self.current.shape()
+    }
+    pub fn nrows(&self) -> usize {
+        self.current.nrows()
+    }
+    pub fn ncols(&self) -> usize {
+        self.current.ncols()
+    }
+    pub fn size(&self) -> usize {
+        self.current.size()
+    }
     pub fn generate(&mut self) -> &mut Self {
         (0..self.current.size()).into_par_iter().for_each(|i| {
             let (nrows, ncols) = self.current.shape();
