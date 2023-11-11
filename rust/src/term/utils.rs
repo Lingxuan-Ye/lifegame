@@ -15,7 +15,7 @@ macro_rules! reset_cursor {
 #[macro_export]
 macro_rules! get_tstr {
     ($cat:expr, $key:expr) => {
-        $crate::term::TermString::from_escseq($crate::term::ESCSEQ[$x][$y])
+        $crate::term::TermString::from_escseq($crate::term::ESCSEQ[$cat][$key])
     };
 }
 
