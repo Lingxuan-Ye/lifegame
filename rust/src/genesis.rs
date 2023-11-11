@@ -1,7 +1,5 @@
-use crate::{
-    biosquare::{Generation, WorldCreator},
-    matrix::Matrix,
-};
+use crate::biosquare::{Generation, WorldCreator};
+use crate::matrix::Matrix;
 use rand::Rng;
 use rand_chacha::{rand_core::SeedableRng, ChaCha8Rng};
 
