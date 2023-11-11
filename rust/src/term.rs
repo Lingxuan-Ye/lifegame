@@ -43,10 +43,20 @@ impl TermString {
         self.data = format!("{:<width$}", self.data);
         self
     }
-    
+
     pub fn rjust(mut self, mut width: usize) -> Self {
         width += self.esc_len;
         self.data = format!("{:>width$}", self.data);
         self
+    }
+}
+
+pub trait IntoTermString {
+    fn into_tstr(self) -> TermString;
+}
+
+impl<T: ToString> IntoTermString for T {
+    fn into_tstr(self) -> TermString {
+        TermString::wrap(self)
     }
 }
