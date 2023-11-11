@@ -3,14 +3,14 @@ use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use std::sync::Mutex;
 
 pub type Generation = Matrix<bool>;
-pub type Biased = Box<dyn Iterator<Item = String>>;
+pub type Biased<'a> = Box<dyn Iterator<Item = String> + 'a>;
 
 pub trait WorldCreator {
     fn create(&self, nrows: usize, ncols: usize) -> Generation;
 }
 
 pub trait LensFilter {
-    fn observe(&self, matrix: &Generation) -> Biased;
+    fn observe<'a>(&'a self, gen: &'a Generation) -> Biased<'a>;
 }
 
 pub struct BioSquare {
