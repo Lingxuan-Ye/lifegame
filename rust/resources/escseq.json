@@ -1,6 +1,6 @@
 {
     "erase": {
-        "screen": "\u001b[2j"
+        "screen": "\u001b[2J"
     },
     "reset": {
         "all": "\u001b[0m",
@@ -13,7 +13,7 @@
         "strikethrough": "\u001b[29m",
         "foreground": "\u001b[39m",
         "background": "\u001b[49m",
-        "cursor": "\u001b[h"
+        "cursor": "\u001b[H"
     },
     "style": {
         "bold": "\u001b[1m",
