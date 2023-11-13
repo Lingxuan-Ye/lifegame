@@ -6,3 +6,6 @@ pub mod matrix;
 pub mod screen;
 pub mod term;
 pub mod timer;
+
+pub use biosquare::{BioSquare, LensFilter, WorldCreator};
+pub use screen::Screen;
