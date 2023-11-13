@@ -1,4 +1,5 @@
 pub mod biosquare;
+pub mod cli;
 pub mod genesis;
 pub mod lensfilter;
 pub mod matrix;
