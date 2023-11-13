@@ -1,14 +1,14 @@
 use super::{Project, Symbol};
 use crate::biosquare::{Biased, Generation, LensFilter};
-use crate::term::IntoTermString;
+use crate::term::ToTermString;
 
 pub struct Digitize(Symbol);
 
 impl Digitize {
     pub fn new() -> Self {
         Digitize(Symbol {
-            alive: "１".into_tstr().set_bold().to_string(),
-            dead: "０".into_tstr().set_bold_dim().to_string(),
+            alive: "１".to_tstr().set_bold().to_string(),
+            dead: "０".to_tstr().set_bold_dim().to_string(),
         })
     }
 }
@@ -26,7 +26,7 @@ impl LensFilter for Digitize {
     fn observe<'a>(&'a self, gen: &'a Generation) -> Biased<'a> {
         Box::new(
             self.project(gen)
-                .map(|row| row.into_tstr().set_color("green").unwrap().to_string()),
+                .map(|row| row.to_tstr().set_color("green").unwrap().to_string()),
         )
     }
 }

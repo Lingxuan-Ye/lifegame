@@ -2,7 +2,7 @@ pub mod config;
 
 use crate::biosquare::BioSquare;
 use crate::term::{erase_screen, reset_cursor};
-use crate::term::{IntoTermString, TermString};
+use crate::term::{TermString, ToTermString};
 use crate::timer::Timer;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -58,9 +58,9 @@ impl Screen {
 
     fn exit_message(&self) -> Rows {
         let message = "GAME OVER";
-        Box::new((0..1).map(|_| {
+        Box::new((0..1).map(move |_| {
             message
-                .into_tstr()
+                .to_tstr()
                 .set_bold()
                 .set_color("green")
                 .unwrap()
@@ -77,9 +77,9 @@ impl Screen {
     pub fn observe(&self) -> Rows {
         Box::new(
             [
-                ("Iteration".into_tstr(), self.iterno.into_tstr()),
-                ("FPS".into_tstr(), format!("{:.2}", self.fps()).into_tstr()),
-                ("Runtime".into_tstr(), self.timer.check_fmt(true)),
+                ("Iteration".to_tstr(), self.iterno.to_tstr()),
+                ("FPS".to_tstr(), format!("{:.2}", self.fps()).to_tstr()),
+                ("Runtime".to_tstr(), self.timer.check_fmt(true)),
             ]
             .into_iter()
             .map(|(label, value)| self.measurement_fmt(label, value).to_string()),

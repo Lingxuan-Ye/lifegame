@@ -1,5 +1,5 @@
 mod add {
-    use super::super::{TermString, IntoTermString};
+    use super::super::{TermString, ToTermString};
     use std::ops::{Add, AddAssign};
 
     impl AddAssign for TermString {
@@ -34,7 +34,7 @@ mod add {
     impl Add<TermString> for String {
         type Output = TermString;
         fn add(self, rhs: TermString) -> Self::Output {
-            self.into_tstr() + rhs
+            self.to_tstr() + rhs
         }
     }
 
@@ -55,7 +55,7 @@ mod add {
     impl Add<TermString> for &str {
         type Output = TermString;
         fn add(self, rhs: TermString) -> Self::Output {
-            self.into_tstr() + rhs
+            self.to_tstr() + rhs
         }
     }
 }

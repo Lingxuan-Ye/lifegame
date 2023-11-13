@@ -23,7 +23,7 @@ pub struct TermString {
 }
 
 impl TermString {
-    pub fn wrap<T: ToString>(seq: T) -> Self {
+    pub fn wrap<T: ToString>(seq: &T) -> Self {
         TermString {
             data: seq.to_string(),
             esc_len: 0,
@@ -79,6 +79,24 @@ impl TermString {
             + Self::from_escseq("reset", "bold/dim").unwrap()
     }
 
+    pub fn set_italic(self) -> Self {
+        Self::from_escseq("style", "italic").unwrap()
+            + self
+            + Self::from_escseq("reset", "italic").unwrap()
+    }
+
+    pub fn set_underline(self) -> Self {
+        Self::from_escseq("style", "underline").unwrap()
+            + self
+            + Self::from_escseq("reset", "underline").unwrap()
+    }
+
+    pub fn set_strikethrough(self) -> Self {
+        Self::from_escseq("style", "strikethrough").unwrap()
+            + self
+            + Self::from_escseq("reset", "strikethrough").unwrap()
+    }
+
     pub fn set_color(self, color: &str) -> Result<Self, &'static str> {
         if let Some(color_seq) = Self::from_escseq("foreground", color) {
             Ok(color_seq + self + Self::from_escseq("reset", "foreground").unwrap())
@@ -96,12 +114,12 @@ impl TermString {
     }
 }
 
-pub trait IntoTermString {
-    fn into_tstr(self) -> TermString;
+pub trait ToTermString {
+    fn to_tstr(&self) -> TermString;
 }
 
-impl<T: ToString> IntoTermString for T {
-    fn into_tstr(self) -> TermString {
+impl<T: ToString> ToTermString for T {
+    fn to_tstr(&self) -> TermString {
         TermString::wrap(self)
     }
 }
