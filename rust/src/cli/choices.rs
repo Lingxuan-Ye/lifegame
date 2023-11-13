@@ -38,8 +38,7 @@ pub fn style_cell_choices(default: &str) -> String {
         let mut variant_t = variant_s.to_tstr().ljust(11).set_bold();
 
         if variant_s == default {
-            variant_t += " <- ".to_tstr().set_bold_dim().set_color("green").unwrap()
-                + "default".to_tstr().set_bold_dim();
+            variant_t += " <= ".to_tstr().set_color("green").unwrap() + "default";
         }
 
         choices.push(format!("  - {variant_t}"));
@@ -91,8 +90,7 @@ pub fn style_color_choices(default: &str) -> String {
         }
 
         if variant_s == default {
-            variant_t += " <- ".to_tstr().set_bold_dim().set_color("green").unwrap()
-                + "default".to_tstr().set_bold_dim();
+            variant_t += " <= ".to_tstr().set_color("green").unwrap() + "default";
         }
 
         choices.push(format!("  - {variant_t}"));
