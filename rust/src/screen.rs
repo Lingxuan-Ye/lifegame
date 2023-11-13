@@ -4,10 +4,8 @@ use crate::biosquare::BioSquare;
 use crate::term::{erase_screen, reset_cursor};
 use crate::term::{TermString, ToTermString};
 use crate::timer::Timer;
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc,
-};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 pub type Rows<'a> = Box<dyn Iterator<Item = String> + 'a>;
 
@@ -24,7 +22,7 @@ pub struct Screen {
     timer: Timer,
     iterno: usize,
     iterno_max: Option<usize>,
-    fps_max: Option<f64>,
+    fps_max: f64,
     show_stats: bool,
     style: Style,
 }
@@ -36,7 +34,7 @@ impl Screen {
             timer: Timer::new(),
             iterno: 0,
             iterno_max: None,
-            fps_max: Some(24.0),
+            fps_max: f64::INFINITY,
             show_stats: true,
             style: Style {
                 x_offset: 2,
@@ -124,11 +122,7 @@ impl Screen {
         })
         .expect("error setting Ctrl-C handler");
 
-        let frame_duration_min: Option<f64> = if let Some(fps_max) = self.fps_max {
-            Some(Timer::NANOS_PER_SEC as f64 / fps_max)
-        } else {
-            None
-        };
+        let frame_duration_min: f64 = Timer::NANOS_PER_SEC as f64 / self.fps_max;
 
         erase_screen();
         self.timer.reset();
@@ -145,9 +139,7 @@ impl Screen {
             self.biosquare.generate();
             self.iterno += 1;
 
-            if let Some(frame_duration_min) = frame_duration_min {
-                while ((self.timer.check(false) - start) as f64) < frame_duration_min {}
-            }
+            while ((self.timer.check(false) - start) as f64) < frame_duration_min {}
         }
 
         self.display(true)

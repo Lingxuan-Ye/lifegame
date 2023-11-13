@@ -6,11 +6,12 @@ impl Screen {
         self
     }
 
-    pub fn set_fps_max(&mut self, fps_max: Option<f64>) -> Result<&mut Self, &str> {
-        if let Some(x) = fps_max {
-            if !x.is_sign_positive() {
-                return Err("value `fps_max` must be positive");
-            }
+    pub fn set_fps_max(&mut self, fps_max: f64) -> Result<&mut Self, &str> {
+        if fps_max.is_nan() {
+            Err("value cannot be NaN")?
+        }
+        if fps_max.is_sign_negative() {
+            Err("value cannot be negative")?
         }
         self.fps_max = fps_max;
         Ok(self)
