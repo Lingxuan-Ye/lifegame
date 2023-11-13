@@ -1,8 +1,8 @@
 use super::TermString;
-use std::fmt::{Display, Formatter};
+use std::fmt;
 
-impl Display for TermString {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for TermString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.data)
     }
 }

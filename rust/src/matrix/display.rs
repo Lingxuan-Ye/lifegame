@@ -1,8 +1,8 @@
 use super::Matrix;
-use std::fmt::{Display, Formatter};
+use std::fmt;
 
-impl<T: Clone + Default + Display> Display for Matrix<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl<T: Clone + Default + fmt::Display> fmt::Display for Matrix<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut max_len: usize = 0;
         let reprs: Vec<String> = self
             .data

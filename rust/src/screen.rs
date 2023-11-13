@@ -122,7 +122,7 @@ impl Screen {
         ctrlc::set_handler(move || {
             r.store(true, Ordering::SeqCst);
         })
-        .expect("Error setting Ctrl-C handler");
+        .expect("error setting Ctrl-C handler");
 
         let frame_duration_min: Option<f64> = if let Some(fps_max) = self.fps_max {
             Some(Timer::NANOS_PER_SEC as f64 / fps_max)

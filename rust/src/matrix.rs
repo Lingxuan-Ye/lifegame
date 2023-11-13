@@ -30,7 +30,7 @@ impl<T: Clone + Default> Matrix<T> {
     }
 
     fn cal_size(nrows: usize, ncols: usize) -> usize {
-        nrows.checked_mul(ncols).expect("Size overflows.")
+        nrows.checked_mul(ncols).expect("size overflows")
     }
 
     pub fn size(&self) -> usize {
@@ -99,7 +99,7 @@ macro_rules! matrix {
                     count += 1;
                     data.push($x);
                 )*
-                assert!(count == shape.1, "inconsistent row lengths detected.")
+                assert!(count == shape.1, "inconsistent row lengths detected")
             }
         )*
         $crate::matrix::Matrix::from_slice(&data, shape)

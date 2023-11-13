@@ -9,7 +9,7 @@ impl Screen {
     pub fn set_fps_max(&mut self, fps_max: Option<f64>) -> Result<&mut Self, &str> {
         if let Some(x) = fps_max {
             if !x.is_sign_positive() {
-                return Err("value `fps_max` must be positive.");
+                return Err("value `fps_max` must be positive");
             }
         }
         self.fps_max = fps_max;
