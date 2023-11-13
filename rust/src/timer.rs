@@ -1,4 +1,4 @@
-use crate::term::{utils::set_dim, TermString};
+use crate::term::{IntoTermString, TermString};
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::time::{Duration, Instant};
@@ -77,18 +77,17 @@ impl Timer {
         let micros = nanos / Self::NANOS_PER_MICRO;
         nanos %= Self::NANOS_PER_MICRO;
 
-        format!("{secs:>3} ")
-            + set_dim("s")
+        secs.into_tstr().rjust(3)
+            + "s".into_tstr().set_dim()
             + Self::FMT_SEP
-            + format!("{millis:>3} ")
-            + set_dim("ms")
+            + millis.into_tstr().rjust(3)
+            + "ms".into_tstr().set_dim()
             + Self::FMT_SEP
-            + format!("{micros:>3} ")
-            + set_dim("μs")
+            + micros.into_tstr().rjust(3)
+            + "μs".into_tstr().set_dim()
             + Self::FMT_SEP
-            + format!("{nanos:>3} ")
-            + set_dim("ns")
-            + Self::FMT_SEP
+            + nanos.into_tstr().rjust(3)
+            + "ns".into_tstr().set_dim()
     }
 
     pub fn check_delta(&self, record: bool) -> u128 {

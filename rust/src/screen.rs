@@ -1,10 +1,9 @@
 pub mod config;
 
 use crate::biosquare::BioSquare;
-use crate::term::utils::{erase_screen, reset_cursor, set_bold, set_bold_t, set_color};
+use crate::term::{erase_screen, reset_cursor};
 use crate::term::{IntoTermString, TermString};
 use crate::timer::Timer;
-use ctrlc;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
@@ -59,11 +58,18 @@ impl Screen {
 
     fn exit_message(&self) -> Rows {
         let message = "GAME OVER";
-        Box::new((0..1).map(|_| set_color(&set_bold(message), "green").to_string()))
+        Box::new((0..1).map(|_| {
+            message
+                .into_tstr()
+                .set_bold()
+                .set_color("green")
+                .unwrap()
+                .to_string()
+        }))
     }
 
     fn measurement_fmt(&self, label: TermString, value: TermString) -> TermString {
-        let label_fmt = set_bold_t(label).ljust(self.style.label_width);
+        let label_fmt = label.set_bold().ljust(self.style.label_width);
         let value_fmt = value.rjust(self.style.value_width);
         label_fmt + value_fmt
     }
