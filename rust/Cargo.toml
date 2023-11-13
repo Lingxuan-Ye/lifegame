@@ -2,7 +2,23 @@
 name = "lifegame"
 version = "0.1.0"
 edition = "2021"
+authors = ["Lingxuan Ye <love@lingxuan.io>"]
+description = "A simple Rust implementation of the classic cellular automaton, Conway's Game of Life."
+readme = "README.md"
+categories = ["command-line-utilities"]
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "4.4.8", features = ["cargo", "derive"] }
+ctrlc = "3.4.1"
+once_cell = "1.18.0"
+rand = "0.8.5"
+rand_chacha = "0.3.1"
+rayon = "1.8.0"
+serde = "1.0.192"
+serde_json = "1.0.108"
+
+[dev-dependencies]
+criterion = "0.3"
