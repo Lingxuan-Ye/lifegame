@@ -1,6 +1,6 @@
 pub mod choices;
 
-use clap::{command, value_parser, Arg, ArgAction, ArgGroup, Command};
+use clap::{command, value_parser, Arg, ArgAction, Command};
 
 pub fn build() -> Command {
     command!().args([
