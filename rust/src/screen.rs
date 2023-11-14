@@ -127,7 +127,7 @@ impl Screen {
         erase_screen();
         self.timer.reset();
 
-        while !recv_sigint.load(Ordering::SeqCst) {
+        'outer: while !recv_sigint.load(Ordering::SeqCst) {
             if let Some(iterno_max) = self.iterno_max {
                 if self.iterno > iterno_max {
                     break;
@@ -139,7 +139,11 @@ impl Screen {
             self.biosquare.generate();
             self.iterno += 1;
 
-            while ((self.timer.check(false) - start) as f64) < frame_duration_min {}
+            while ((self.timer.check(false) - start) as f64) < frame_duration_min {
+                if recv_sigint.load(Ordering::SeqCst) {
+                    break 'outer;
+                }
+            }
         }
 
         self.display(true)
