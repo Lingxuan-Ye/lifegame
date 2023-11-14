@@ -24,13 +24,13 @@ impl<'a, T: Clone + Default> Iterator for RowIter<'a, T> {
         if self.count >= self.matrix.nrows() {
             return None;
         }
-        self.count += 1;
         let iter = self
             .matrix
             .data
             .iter()
             .skip(self.count * self.matrix.ncols())
             .take(self.matrix.ncols());
+        self.count += 1;
         Some(iter)
     }
 }
@@ -54,13 +54,13 @@ impl<'a, T: Clone + Default> Iterator for ColIter<'a, T> {
         if self.count >= self.matrix.ncols() {
             return None;
         }
-        self.count += 1;
         let iter = self
             .matrix
             .data
             .iter()
             .skip(self.count)
-            .step_by(self.matrix.nrows());
+            .step_by(self.matrix.ncols());
+        self.count += 1;
         Some(iter)
     }
 }
@@ -112,5 +112,30 @@ impl<T: Clone + Default + Sync> Matrix<T> {
             data: self.data.par_iter().map(f).collect(),
             shape: self.shape,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::matrix;
+
+    #[test]
+    fn test_iterrows() {
+        let matrix = matrix![[0, 1], [2, 3], [4, 5]];
+        let mut rows: Vec<Vec<i32>> = Vec::with_capacity(3);
+        for row in matrix.iterrows() {
+            rows.push(row.map(|&n| n).collect());
+        }
+        assert_eq!(rows, vec![vec![0, 1], vec![2, 3], vec![4, 5]]);
+    }
+
+    #[test]
+    fn test_itercols() {
+        let matrix = matrix![[0, 1], [2, 3], [4, 5]];
+        let mut cols: Vec<Vec<i32>> = Vec::with_capacity(2);
+        for col in matrix.itercols() {
+            cols.push(col.map(|&n| n).collect());
+        }
+        assert_eq!(cols, vec![vec![0, 2, 4], vec![1, 3, 5]]);
     }
 }

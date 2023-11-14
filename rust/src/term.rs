@@ -9,7 +9,7 @@ pub static ESCSEQ: Lazy<HashMap<String, HashMap<String, String>>> =
 
 #[inline]
 pub fn erase_screen() {
-    println!("{}", &ESCSEQ["erase"]["screen"]);
+    print!("{}", &ESCSEQ["erase"]["screen"]);
 }
 
 #[inline]
