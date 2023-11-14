@@ -69,10 +69,17 @@ impl Screen {
     }
 
     pub fn observe(&self) -> Rows {
+        let density = self.biosquare.population_density();
+        let density_fmt = format!("{:.2} %", density * 100.0).to_tstr();
+
+        let fps = Timer::NANOS_PER_SEC as f64 / self.timer.check_delta(false) as f64;
+        let fps_fmt = format!("{:.2}", fps).to_tstr();
+
         Box::new(
             [
                 ("Iteration".to_tstr(), self.iterno.to_tstr()),
-                ("FPS".to_tstr(), format!("{:.2}", self.fps()).to_tstr()),
+                ("Population Density".to_tstr(), density_fmt),
+                ("FPS".to_tstr(), fps_fmt),
                 ("Runtime".to_tstr(), self.timer.check_fmt(true)),
             ]
             .into_iter()
