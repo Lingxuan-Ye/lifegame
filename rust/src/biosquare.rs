@@ -1,6 +1,7 @@
 use crate::matrix::Matrix;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-use std::sync::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex};
 
 pub type Generation = Matrix<bool>;
 pub type Biased<'a> = Box<dyn Iterator<Item = String> + 'a>;
@@ -88,6 +89,17 @@ impl BioSquare {
 
     pub fn observe(&self) -> Biased {
         self.lensfilter.observe(&self.current)
+    }
+
+    pub fn population_density(&self) -> f64 {
+        let sum = Arc::new(AtomicUsize::new(0));
+        let gen = &self.current;
+        gen.par_for_each_index(|index| {
+            if gen[index] {
+                sum.fetch_add(1, Ordering::Relaxed);
+            };
+        });
+        sum.load(Ordering::Relaxed) as f64 / gen.size() as f64
     }
 
     pub fn reset(&mut self) -> &mut Self {
