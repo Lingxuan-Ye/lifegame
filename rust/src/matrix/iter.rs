@@ -1,9 +1,7 @@
 use super::Matrix;
 use rayon::prelude::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
-use std::{
-    iter::{Skip, StepBy, Take},
-    slice::Iter,
-};
+use std::iter::{Skip, StepBy, Take};
+use std::slice::Iter;
 
 pub struct RowIter<'a, T: Clone + Default> {
     matrix: &'a Matrix<T>,
@@ -94,13 +92,13 @@ impl<T: Clone + Default> Matrix<T> {
 }
 
 impl<T: Clone + Default + Sync> Matrix<T> {
-    pub fn par_for_each<F>(&self, f: F)
+    pub fn par_for_each_index<F>(&self, f: F)
     where
-        F: Fn(usize, usize) + Sync,
+        F: Fn((usize, usize)) + Sync,
     {
         (0..self.size())
             .into_par_iter()
-            .for_each(|i| f(i / self.shape.1, i % self.shape.1))
+            .for_each(|i| f((i / self.shape.1, i % self.shape.1)))
     }
 
     pub fn par_map<U, F>(&self, f: F) -> Matrix<U>

@@ -1,11 +1,12 @@
 [package]
 name = "lifegame"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Lingxuan Ye <love@lingxuan.io>"]
 description = "A simple Rust implementation of the classic cellular automaton, Conway's Game of Life."
 readme = "README.md"
 categories = ["command-line-utilities"]
+repository = "https://github.com/Lingxuan-Ye/lifegame/tree/main/rust"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -20,5 +21,5 @@ rayon = "1.8.0"
 serde = "1.0.192"
 serde_json = "1.0.108"
 
-[dev-dependencies]
-criterion = "0.3"
+# [dev-dependencies]
+# criterion = "0.3"

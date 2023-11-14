@@ -65,6 +65,10 @@ impl Timer {
         elapsed
     }
 
+    fn measurement_fmt(value: u128, unit: &str) -> TermString {
+        value.to_tstr().rjust(3) + " " + unit.to_tstr().set_dim()
+    }
+
     pub fn check_fmt(&self, record: bool) -> TermString {
         let mut nanos = self.check(record);
 
@@ -77,17 +81,13 @@ impl Timer {
         let micros = nanos / Self::NANOS_PER_MICRO;
         nanos %= Self::NANOS_PER_MICRO;
 
-        secs.to_tstr().rjust(3)
-            + "s".to_tstr().set_dim()
+        Self::measurement_fmt(secs, "s")
             + Self::FMT_SEP
-            + millis.to_tstr().rjust(3)
-            + "ms".to_tstr().set_dim()
+            + Self::measurement_fmt(millis, "ms")
             + Self::FMT_SEP
-            + micros.to_tstr().rjust(3)
-            + "μs".to_tstr().set_dim()
+            + Self::measurement_fmt(micros, "μs")
             + Self::FMT_SEP
-            + nanos.to_tstr().rjust(3)
-            + "ns".to_tstr().set_dim()
+            + Self::measurement_fmt(nanos, "ns")
     }
 
     pub fn check_delta(&self, record: bool) -> u128 {

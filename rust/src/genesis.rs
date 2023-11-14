@@ -5,14 +5,14 @@ use rand_chacha::{rand_core::SeedableRng, ChaCha8Rng};
 
 pub struct DicingGod {
     pub seed: Option<u64>,
-    pub population_density: f64,
+    pub initial_density: f64,
 }
 
 impl DicingGod {
-    pub fn new(seed: Option<u64>, population_density: f64) -> Self {
+    pub fn new(seed: Option<u64>, initial_density: f64) -> Self {
         Self {
             seed,
-            population_density,
+            initial_density,
         }
     }
 }
@@ -28,7 +28,7 @@ impl WorldCreator for DicingGod {
         }
 
         let data: Vec<bool> = (0..nrows * ncols)
-            .map(|_| rng.gen_bool(self.population_density))
+            .map(|_| rng.gen_bool(self.initial_density))
             .collect();
 
         Matrix::from_slice(&data, (nrows, ncols))

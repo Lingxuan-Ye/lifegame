@@ -1,6 +1,6 @@
 use crate::matrix::Matrix;
-use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-use std::sync::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex};
 
 pub type Generation = Matrix<bool>;
 pub type Biased<'a> = Box<dyn Iterator<Item = String> + 'a>;
@@ -54,11 +54,8 @@ impl BioSquare {
     }
 
     pub fn generate(&mut self) -> &mut Self {
-        (0..self.current.size()).into_par_iter().for_each(|i| {
-            let (nrows, ncols) = self.current.shape();
-            let row = i / ncols;
-            let col = i % ncols;
-
+        let (nrows, ncols) = self.current.shape();
+        self.current.par_for_each_index(|(row, col)| {
             let mut count = 0;
             for row_offet in -1..=1 {
                 for col_offset in -1..=1 {
@@ -66,6 +63,11 @@ impl BioSquare {
                         continue;
                     }
                     if self.current[(
+                        // Given that `nrows` is at most `usize::MAX`
+                        // and `row` is always less than `nrows`,
+                        // the offset operation will only result in
+                        // underflow at 0, which ensures that the code
+                        // functions as expected.
                         row.checked_add_signed(row_offet).unwrap_or(nrows - 1) % nrows,
                         col.checked_add_signed(col_offset).unwrap_or(ncols - 1) % ncols,
                     )] {
@@ -73,12 +75,11 @@ impl BioSquare {
                     }
                 }
             }
-
             let state = self.current[(row, col)];
-            let mut next_generation = self.next.lock().unwrap();
+            let mut next_gen = self.next.lock().unwrap();
             match (state, count) {
-                (true, x) if x != 2 && x != 3 => next_generation[(row, col)] = false,
-                (false, 3) => next_generation[(row, col)] = true,
+                (true, x) if x != 2 && x != 3 => next_gen[(row, col)] = false,
+                (false, 3) => next_gen[(row, col)] = true,
                 _ => (),
             }
         });
@@ -88,6 +89,17 @@ impl BioSquare {
 
     pub fn observe(&self) -> Biased {
         self.lensfilter.observe(&self.current)
+    }
+
+    pub fn population_density(&self) -> f64 {
+        let sum = Arc::new(AtomicUsize::new(0));
+        let gen = &self.current;
+        gen.par_for_each_index(|index| {
+            if gen[index] {
+                sum.fetch_add(1, Ordering::Relaxed);
+            };
+        });
+        sum.load(Ordering::Relaxed) as f64 / gen.size() as f64
     }
 
     pub fn reset(&mut self) -> &mut Self {

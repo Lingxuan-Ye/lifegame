@@ -11,10 +11,11 @@ fn main() {
     let &ncols = matches.get_one::<usize>("ncols").unwrap();
 
     let seed = matches.get_one::<u64>("seed").map(|&u| u);
-    let &population_density = matches.get_one::<f64>("density").unwrap();
-    let world_creator = Box::new(genesis::DicingGod::new(seed, population_density));
+    let &initial_density = matches.get_one::<f64>("density").unwrap();
+    let world_creator = Box::new(genesis::DicingGod::new(seed, initial_density));
 
     let lensfilter: Box<dyn LensFilter> = match matches.get_one::<Cell>("cell").unwrap() {
+        Cell::AsciiBit => Box::new(lensfilter::Digitize::ascii_compatible()),
         Cell::Bit => Box::new(lensfilter::Digitize::new()),
         Cell::Block => Box::new(lensfilter::Blockify::new()),
         Cell::Emoji => Box::new(lensfilter::Emojify::random()),

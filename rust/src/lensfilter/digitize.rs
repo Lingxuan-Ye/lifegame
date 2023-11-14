@@ -11,6 +11,13 @@ impl Digitize {
             dead: "０".to_tstr().set_bold_dim().to_string(),
         })
     }
+
+    pub fn ascii_compatible() -> Self {
+        Digitize(Symbol {
+            alive: "1".to_tstr().set_bold().to_string(),
+            dead: "0".to_tstr().set_bold_dim().to_string(),
+        })
+    }
 }
 
 impl Project for Digitize {

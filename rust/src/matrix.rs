@@ -58,7 +58,6 @@ impl<T: Clone + Default> Matrix<T> {
 
 /// Creates a [`Matrix`] with 2-dimensional array literal.
 ///
-///
 /// # Panics
 ///
 /// `matrix!` panics if row lengths of the given array are inconsistent.

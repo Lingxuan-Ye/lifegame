@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Cell {
+    AsciiBit,
     Bit,
     Block,
     Emoji,

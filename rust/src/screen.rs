@@ -46,12 +46,33 @@ impl Screen {
         }
     }
 
-    pub fn fps(&self) -> f64 {
-        Timer::NANOS_PER_SEC as f64 / self.timer.check_delta(false) as f64
-    }
-
     fn seperate_sections(&self) -> Rows {
         Box::new((0..self.style.section_sep).map(|_| String::from("")))
+    }
+
+    fn measurement_fmt(&self, label: TermString, value: TermString) -> TermString {
+        let label_fmt = label.set_bold().ljust(self.style.label_width);
+        let value_fmt = value.rjust(self.style.value_width);
+        label_fmt + value_fmt
+    }
+
+    pub fn observe(&self) -> Rows {
+        let density = self.biosquare.population_density();
+        let density_fmt = format!("{:.2} %", density * 100.0).to_tstr();
+
+        let fps = Timer::NANOS_PER_SEC as f64 / self.timer.check_delta(false) as f64;
+        let fps_fmt = format!("{:.2}", fps).to_tstr();
+
+        Box::new(
+            [
+                ("Iteration".to_tstr(), self.iterno.to_tstr()),
+                ("Population Density".to_tstr(), density_fmt),
+                ("FPS".to_tstr(), fps_fmt),
+                ("Runtime".to_tstr(), self.timer.check_fmt(true)),
+            ]
+            .into_iter()
+            .map(|(label, value)| self.measurement_fmt(label, value).to_string()),
+        )
     }
 
     fn exit_message(&self) -> Rows {
@@ -64,24 +85,6 @@ impl Screen {
                 .unwrap()
                 .to_string()
         }))
-    }
-
-    fn measurement_fmt(&self, label: TermString, value: TermString) -> TermString {
-        let label_fmt = label.set_bold().ljust(self.style.label_width);
-        let value_fmt = value.rjust(self.style.value_width);
-        label_fmt + value_fmt
-    }
-
-    pub fn observe(&self) -> Rows {
-        Box::new(
-            [
-                ("Iteration".to_tstr(), self.iterno.to_tstr()),
-                ("FPS".to_tstr(), format!("{:.2}", self.fps()).to_tstr()),
-                ("Runtime".to_tstr(), self.timer.check_fmt(true)),
-            ]
-            .into_iter()
-            .map(|(label, value)| self.measurement_fmt(label, value).to_string()),
-        )
     }
 
     fn render(&self, is_last_frame: bool) -> Rows {
@@ -127,7 +130,7 @@ impl Screen {
         erase_screen();
         self.timer.reset();
 
-        while !recv_sigint.load(Ordering::SeqCst) {
+        'outer: while !recv_sigint.load(Ordering::SeqCst) {
             if let Some(iterno_max) = self.iterno_max {
                 if self.iterno > iterno_max {
                     break;
@@ -139,7 +142,11 @@ impl Screen {
             self.biosquare.generate();
             self.iterno += 1;
 
-            while ((self.timer.check(false) - start) as f64) < frame_duration_min {}
+            while ((self.timer.check(false) - start) as f64) < frame_duration_min {
+                if recv_sigint.load(Ordering::SeqCst) {
+                    break 'outer;
+                }
+            }
         }
 
         self.display(true)

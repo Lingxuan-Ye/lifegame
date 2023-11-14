@@ -4,7 +4,11 @@ use crate::term::ESCSEQ;
 use rand::seq::{IteratorRandom, SliceRandom};
 use rand_chacha::{rand_core::SeedableRng, ChaCha8Rng};
 
-const FSPACE: &str = "　";
+// Besides offering better compatibility, using two half-width spaces
+// may also lead to better performance, since it requires only 2 bytes
+// with utf-8 encoding whereas using a full-width space requires 3.
+const FSPACE: &str = "  ";
+// const FSPACE: &str = "　";
 
 pub struct Dye(Symbol);
 
