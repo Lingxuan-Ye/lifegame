@@ -50,18 +50,6 @@ impl Screen {
         Box::new((0..self.style.section_sep).map(|_| String::from("")))
     }
 
-    fn exit_message(&self) -> Rows {
-        let message = "GAME OVER";
-        Box::new((0..1).map(move |_| {
-            message
-                .to_tstr()
-                .set_bold()
-                .set_color("green")
-                .unwrap()
-                .to_string()
-        }))
-    }
-
     fn measurement_fmt(&self, label: TermString, value: TermString) -> TermString {
         let label_fmt = label.set_bold().ljust(self.style.label_width);
         let value_fmt = value.rjust(self.style.value_width);
@@ -85,6 +73,18 @@ impl Screen {
             .into_iter()
             .map(|(label, value)| self.measurement_fmt(label, value).to_string()),
         )
+    }
+
+    fn exit_message(&self) -> Rows {
+        let message = "GAME OVER";
+        Box::new((0..1).map(move |_| {
+            message
+                .to_tstr()
+                .set_bold()
+                .set_color("green")
+                .unwrap()
+                .to_string()
+        }))
     }
 
     fn render(&self, is_last_frame: bool) -> Rows {

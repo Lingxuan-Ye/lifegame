@@ -63,11 +63,11 @@ impl BioSquare {
                         continue;
                     }
                     if self.current[(
-                        // given that `nrows` is at most `usize::MAX`
+                        // Given that `nrows` is at most `usize::MAX`
                         // and `row` is always less than `nrows`,
                         // the offset operation will only result in
                         // underflow at 0, which ensures that the code
-                        // functions as expected
+                        // functions as expected.
                         row.checked_add_signed(row_offet).unwrap_or(nrows - 1) % nrows,
                         col.checked_add_signed(col_offset).unwrap_or(ncols - 1) % ncols,
                     )] {

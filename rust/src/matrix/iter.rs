@@ -1,9 +1,7 @@
 use super::Matrix;
 use rayon::prelude::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
-use std::{
-    iter::{Skip, StepBy, Take},
-    slice::Iter,
-};
+use std::iter::{Skip, StepBy, Take};
+use std::slice::Iter;
 
 pub struct RowIter<'a, T: Clone + Default> {
     matrix: &'a Matrix<T>,
