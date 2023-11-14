@@ -6,6 +6,7 @@ authors = ["Lingxuan Ye <love@lingxuan.io>"]
 description = "A simple Rust implementation of the classic cellular automaton, Conway's Game of Life."
 readme = "README.md"
 categories = ["command-line-utilities"]
+repository = "https://github.com/Lingxuan-Ye/lifegame/tree/main/rust"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
