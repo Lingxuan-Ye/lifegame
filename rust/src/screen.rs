@@ -46,10 +46,6 @@ impl Screen {
         }
     }
 
-    pub fn fps(&self) -> f64 {
-        Timer::NANOS_PER_SEC as f64 / self.timer.check_delta(false) as f64
-    }
-
     fn seperate_sections(&self) -> Rows {
         Box::new((0..self.style.section_sep).map(|_| String::from("")))
     }
