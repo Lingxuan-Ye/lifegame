@@ -16,12 +16,12 @@ class _LensFilter(ABC):
     sym_alive: str
     sym_dead: str
 
-    def _lensfilter(self, matrix: Generation) -> Biased:
-        film = np.where(matrix, self.sym_alive, self.sym_dead)
-        return ("".join(row) for row in film)
+    def _project(self, gen: Generation) -> Biased:
+        image = np.where(gen, self.sym_alive, self.sym_dead)
+        return ("".join(row) for row in image)
 
     @abstractmethod
-    def __call__(self, matrix: Generation) -> Biased:
+    def observe(self, gen: Generation) -> Biased:
         pass
 
 
@@ -33,8 +33,8 @@ class Digitize(_LensFilter):
     sym_alive = str(set_bold("１"))
     sym_dead = str(set_bold_dim("０"))
 
-    def __call__(self, matrix: Generation) -> Biased:
-        for row in self._lensfilter(matrix):
+    def observe(self, gen: Generation) -> Biased:
+        for row in self._project(gen):
             yield str(set_color(row, "green"))
 
 
@@ -42,8 +42,8 @@ class Blockify(_LensFilter):
     sym_alive = "██"
     sym_dead = "  "
 
-    def __call__(self, matrix: Generation) -> Biased:
-        return self._lensfilter(matrix)
+    def observe(self, gen: Generation) -> Biased:
+        return self._project(gen)
 
 
 class Emojify(_LensFilter):
@@ -51,13 +51,13 @@ class Emojify(_LensFilter):
         self.sym_alive = sym_alive
         self.sym_dead = sym_dead
 
-    def __call__(self, matrix: Generation) -> Biased:
-        return self._lensfilter(matrix)
+    def observe(self, gen: Generation) -> Biased:
+        return self._project(gen)
 
     @classmethod
     def random(cls, seed: int | None = None) -> Self:
         random.seed(seed)
-        sym_alive = random.choice("😄😁😆🤣😊🥰😍😘😚🤗🤭😋🤤🥳😳😤")
+        sym_alive = random.choice("😆🤣😊🥰😍🤗🤭😋🤤😤")
         sym_dead = random.choice("🤢🥶🥵😡🤬😈👿🤡👻")
         return cls(sym_alive, sym_dead)
 
@@ -69,8 +69,8 @@ class Dye(_LensFilter):
         self.sym_alive = BACKGROUND[color_alive] + self.FSPACE
         self.sym_dead = BACKGROUND[color_dead] + self.FSPACE
 
-    def __call__(self, matrix: Generation) -> Biased:
-        for row in self._lensfilter(matrix):
+    def observe(self, gen: Generation) -> Biased:
+        for row in self._project(gen):
             yield row + RESET["all"]
 
     @classmethod

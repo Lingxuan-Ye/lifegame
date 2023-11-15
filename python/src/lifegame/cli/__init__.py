@@ -130,15 +130,15 @@ def lifegame(
     filter: LensFilter
     match cell:
         case "bit":
-            filter = lensfilter.Digitize()
+            filter = lensfilter.Digitize().observe
         case "block":
-            filter = lensfilter.Blockify()
+            filter = lensfilter.Blockify().observe
         case "emoji":
-            filter = lensfilter.Emojify.random()
+            filter = lensfilter.Emojify.random().observe
         case "dye":
-            filter = lensfilter.Dye(color_alive, color_dead)
+            filter = lensfilter.Dye(color_alive, color_dead).observe
         case "random-dye":
-            filter = lensfilter.Dye.random()
+            filter = lensfilter.Dye.random().observe
     biosquare = BioSquare(nrows, ncols, genesis.DicingGod(seed), filter)
     screen = Screen(
         biosquare,
