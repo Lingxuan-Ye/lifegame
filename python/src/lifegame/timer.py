@@ -49,13 +49,11 @@ class Timer:
         return self.format(self.check(record))
 
     def check_delta(self, record: bool = False) -> int:
-        elapsed = time.time_ns() - self.__timezero
+        elapsed = self.check(record)
         if self.__records:
             delta = elapsed - self.__records[-1]
         else:
             delta = elapsed
-        if record:
-            self.__records.append(elapsed)
         return delta
 
     def reset(self) -> Self:
