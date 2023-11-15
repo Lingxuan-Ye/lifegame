@@ -124,7 +124,7 @@ def lifegame(
 ):
     """
     \b
-    A simple implementation of the classic cellular automaton,
+    A simple Python implementation of the classic cellular automaton,
     Conway's Game of Life.
     """
     filter: LensFilter
