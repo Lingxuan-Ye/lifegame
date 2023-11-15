@@ -1,6 +1,6 @@
 import numpy as np
 
-from .biosquare import Matrix
+from .biosquare import Generation
 
 
 class DicingGod:
@@ -11,6 +11,6 @@ class DicingGod:
     def seed(self) -> int | None:
         return self.__seed
 
-    def __call__(self, nrows: int, ncols: int) -> Matrix:
+    def __call__(self, nrows: int, ncols: int) -> Generation:
         rng = np.random.Generator(np.random.PCG64(self.seed))
         return rng.integers(0, 2, size=(nrows, ncols), dtype=np.bool_)

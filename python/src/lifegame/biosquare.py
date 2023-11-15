@@ -3,10 +3,10 @@ from typing import Any, Callable, Generator, Self
 import numpy as np
 from scipy.signal import convolve2d
 
-Matrix = np.ndarray[Any, np.dtype[np.bool_]]
+Generation = np.ndarray[Any, np.dtype[np.bool_]]
 Biased = Generator[str, None, None]
-WorldCreator = Callable[[int, int], Matrix]
-LensFilter = Callable[[Matrix], Biased]
+WorldCreator = Callable[[int, int], Generation]
+LensFilter = Callable[[Generation], Biased]
 
 
 class BioSquare:

@@ -4,7 +4,7 @@ from typing import Self
 
 import numpy as np
 
-from .biosquare import Biased, Matrix
+from .biosquare import Biased, Generation
 from .term import BACKGROUND, RESET, set_bold, set_bold_dim, set_color
 
 
@@ -16,12 +16,12 @@ class _LensFilter(ABC):
     sym_alive: str
     sym_dead: str
 
-    def _lensfilter(self, matrix: Matrix) -> Biased:
+    def _lensfilter(self, matrix: Generation) -> Biased:
         film = np.where(matrix, self.sym_alive, self.sym_dead)
         return ("".join(row) for row in film)
 
     @abstractmethod
-    def __call__(self, matrix: Matrix) -> Biased:
+    def __call__(self, matrix: Generation) -> Biased:
         pass
 
 
@@ -33,7 +33,7 @@ class Digitize(_LensFilter):
     sym_alive = str(set_bold("１"))
     sym_dead = str(set_bold_dim("０"))
 
-    def __call__(self, matrix: Matrix) -> Biased:
+    def __call__(self, matrix: Generation) -> Biased:
         for row in self._lensfilter(matrix):
             yield str(set_color(row, "green"))
 
@@ -42,7 +42,7 @@ class Blockify(_LensFilter):
     sym_alive = "██"
     sym_dead = "  "
 
-    def __call__(self, matrix: Matrix) -> Biased:
+    def __call__(self, matrix: Generation) -> Biased:
         return self._lensfilter(matrix)
 
 
@@ -51,7 +51,7 @@ class Emojify(_LensFilter):
         self.sym_alive = sym_alive
         self.sym_dead = sym_dead
 
-    def __call__(self, matrix: Matrix) -> Biased:
+    def __call__(self, matrix: Generation) -> Biased:
         return self._lensfilter(matrix)
 
     @classmethod
@@ -69,7 +69,7 @@ class Dye(_LensFilter):
         self.sym_alive = BACKGROUND[color_alive] + self.FSPACE
         self.sym_dead = BACKGROUND[color_dead] + self.FSPACE
 
-    def __call__(self, matrix: Matrix) -> Biased:
+    def __call__(self, matrix: Generation) -> Biased:
         for row in self._lensfilter(matrix):
             yield row + RESET["all"]
 
