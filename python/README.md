@@ -1,7 +1,10 @@
 # LifeGame-TUI
 
+A simple Python implementation of the classic cellular automaton, Conway's Game of Life.
+
 [![PyPI - Version](https://img.shields.io/pypi/v/lifegame-tui.svg)](https://pypi.org/project/lifegame-tui)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/lifegame-tui.svg)](https://pypi.org/project/lifegame-tui)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 -----
 
@@ -20,7 +23,7 @@ pip install lifegame-tui
 
 ## Usage
 
-Create a lifegame with $80 \times 100$ cells (please resize your terminal window in case of display glitches):
+Create a lifegame with $80 \times 100$ cells (resize your terminal window to prevent display glitches):
 
 ```console
 lifegame --nrows 80 --ncols 100
@@ -40,12 +43,12 @@ lifegame --cell emoji
 
 Share your game:
 
-```console
-# save
-lifegame --hide-stats --iteration-max 1000 > some_file
+```
+# save to file
+lifegame --hide-stats --iteration-max 1000 > <SOME_FILE>
 
-# load
-cat some_file || type fome_file
+# load from file
+cat <SOME_FILE> || type <SOME_FILE>
 ```
 
 ## License
