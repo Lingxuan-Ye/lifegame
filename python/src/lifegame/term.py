@@ -104,6 +104,10 @@ class TermString(UserString):
         inst.esc_len = self.esc_len
         return inst
 
+    @classmethod
+    def from_escseq(cls, seq: str) -> Self:
+        return cls(seq, esc_len=len(seq))
+
 
 def erase_screen() -> None:
     print(ERASE["screen"] + RESET["cursor"], end="")
