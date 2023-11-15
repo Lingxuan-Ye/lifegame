@@ -117,31 +117,31 @@ def reset_cursor() -> None:
     print(RESET["cursor"], end="")
 
 
-def get_tstr(escseq_dict: dict[str, str], key: str) -> TermString:
+def _get_tstr(escseq_dict: dict[str, str], key: str) -> TermString:
     escseq = escseq_dict[key]
-    return TermString(escseq, esc_len=len(escseq))
+    return TermString.from_escseq(escseq)
 
 
 def set_bold(value: str | TermString) -> TermString:
-    return get_tstr(STYLE, "bold") + value + get_tstr(RESET, "bold/dim")
+    return _get_tstr(STYLE, "bold") + value + _get_tstr(RESET, "bold/dim")
 
 
 def set_dim(value: str | TermString) -> TermString:
-    return get_tstr(STYLE, "dim") + value + get_tstr(RESET, "bold/dim")
+    return _get_tstr(STYLE, "dim") + value + _get_tstr(RESET, "bold/dim")
 
 
 def set_bold_dim(value: str | TermString) -> TermString:
     return (
-        get_tstr(STYLE, "bold")
-        + get_tstr(STYLE, "dim")
+        _get_tstr(STYLE, "bold")
+        + _get_tstr(STYLE, "dim")
         + value
-        + get_tstr(RESET, "bold/dim")
+        + _get_tstr(RESET, "bold/dim")
     )
 
 
 def set_color(value: str | TermString, color: str) -> TermString:
-    return get_tstr(FOREGROUND, color) + value + get_tstr(RESET, "foreground")
+    return _get_tstr(FOREGROUND, color) + value + _get_tstr(RESET, "foreground")
 
 
 def set_color_bg(value: str | TermString, color: str) -> TermString:
-    return get_tstr(BACKGROUND, color) + value + get_tstr(RESET, "background")
+    return _get_tstr(BACKGROUND, color) + value + _get_tstr(RESET, "background")
