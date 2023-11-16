@@ -2,13 +2,13 @@ import time
 from collections import deque
 from typing import Self
 
-from .term import TermString, set_dim
+from .term import TermString
 
 
 class Timer:
-    NS_PER_S = 10**9
-    NS_PER_MS = 10**6
-    NS_PER_MUS = 10**3
+    NANOS_PER_SEC = 10**9
+    NANOS_PER_MILLI = 10**6
+    NANOS_PER_MICRO = 10**3
 
     FMT_SEP = " - "
 
@@ -27,35 +27,33 @@ class Timer:
         return elapsed
 
     @staticmethod
-    def _style(value: int, unit: str) -> TermString:
-        return f"{value:>3} " + set_dim(unit)
+    def _measurement_fmt(value: int, unit: str) -> TermString:
+        return f"{value:>3} " + TermString(unit).set_dim()
 
     @classmethod
-    def format(cls, ns: int) -> TermString:
-        s, ns = divmod(ns, cls.NS_PER_S)
-        ms, ns = divmod(ns, cls.NS_PER_MS)
-        mus, ns = divmod(ns, cls.NS_PER_MUS)
+    def format(cls, nanos: int) -> TermString:
+        secs, nanos = divmod(nanos, cls.NANOS_PER_SEC)
+        millis, nanos = divmod(nanos, cls.NANOS_PER_MILLI)
+        micros, nanos = divmod(nanos, cls.NANOS_PER_MICRO)
         return (
-            cls._style(s, "s")
+            cls._measurement_fmt(secs, "s")
             + cls.FMT_SEP
-            + cls._style(ms, "ms")
+            + cls._measurement_fmt(millis, "ms")
             + cls.FMT_SEP
-            + cls._style(mus, "μs")
+            + cls._measurement_fmt(micros, "μs")
             + cls.FMT_SEP
-            + cls._style(ns, "ns")
+            + cls._measurement_fmt(nanos, "ns")
         )
 
     def check_fmt(self, record: bool = False) -> TermString:
         return self.format(self.check(record))
 
     def check_delta(self, record: bool = False) -> int:
-        elapsed = time.time_ns() - self.__timezero
+        elapsed = self.check(record)
         if self.__records:
             delta = elapsed - self.__records[-1]
         else:
             delta = elapsed
-        if record:
-            self.__records.append(elapsed)
         return delta
 
     def reset(self) -> Self:

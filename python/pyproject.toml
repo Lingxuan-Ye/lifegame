@@ -1,7 +1,7 @@
 [project]
 name = "LifeGame-TUI"
 dynamic = ["version"]
-description = "A simple implementation of the classic cellular automaton, Conway's Game of Life."
+description = "A simple Python implementation of the classic cellular automaton, Conway's Game of Life."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
