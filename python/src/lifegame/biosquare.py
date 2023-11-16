@@ -1,12 +1,20 @@
-from typing import Any, Callable, Generator, Self
+from typing import Any, Generator, Protocol, Self
 
 import numpy as np
-from scipy.signal import convolve2d
+from scipy.signal import convolve2d  # type: ignore
 
 Generation = np.ndarray[Any, np.dtype[np.bool_]]
 Biased = Generator[str, None, None]
-WorldCreator = Callable[[int, int], Generation]
-LensFilter = Callable[[Generation], Biased]
+
+
+class WorldCreator(Protocol):
+    def create(self, nrows: int, ncols: int) -> Generation:
+        pass
+
+
+class LensFilter(Protocol):
+    def observe(self, gen: Generation) -> Biased:
+        pass
 
 
 class BioSquare:
@@ -19,24 +27,27 @@ class BioSquare:
         world_creator: WorldCreator,
         lensfilter: LensFilter,
     ) -> None:
-        self.matrix = world_creator(nrows, ncols)
+        self.generation = world_creator.create(nrows, ncols)
         self.creator = world_creator
         self.lensfilter = lensfilter
 
     def generate(self) -> Self:
-        result = convolve2d(
-            self.matrix,
+        result: np.ndarray = convolve2d(
+            self.generation,
             self.KERNEL,
             mode="same",
             boundary="wrap",
         )
-        self.matrix[result == 3] = True
-        self.matrix[(result != -6) & (result != -7) & (result < 0)] = False
+        self.generation[result == 3] = True
+        self.generation[(result != -6) & (result != -7) & (result < 0)] = False
         return self
 
     def observe(self) -> Biased:
-        return self.lensfilter(self.matrix)
+        return self.lensfilter.observe(self.generation)
+
+    def population_density(self) -> float:
+        return self.generation.sum() / self.generation.size
 
     def reset(self) -> Self:
-        self.matrix = self.creator(*self.matrix.shape)
+        self.generation = self.creator.create(*self.generation.shape)
         return self
