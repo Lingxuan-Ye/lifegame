@@ -1,5 +1,6 @@
 pub mod choices;
 
+use self::choices::StyleChoice;
 use clap::{command, value_parser, Arg, ArgAction, Command};
 
 pub fn build() -> Command {
@@ -53,7 +54,7 @@ pub fn build() -> Command {
             .hide_possible_values(true)
             .help(format!(
                 "Specify cell style\n{choices}",
-                choices = choices::style_cell_choices("dye")
+                choices = choices::Cell::style(choices::Cell::Dye)
             )),
         Arg::new("color-alive")
             .short('A')
@@ -65,7 +66,7 @@ pub fn build() -> Command {
             .hide_possible_values(true)
             .help(format!(
                 "Color for alive cells, valid when `--cell=dye'\n{choices}",
-                choices = choices::style_color_choices("white")
+                choices = choices::Color::style(choices::Color::White)
             )),
         Arg::new("color-dead")
             .short('D')
@@ -77,7 +78,7 @@ pub fn build() -> Command {
             .hide_possible_values(true)
             .help(format!(
                 "Color for dead cells, valid when `--cell=dye'\n{choices}",
-                choices = choices::style_color_choices("green")
+                choices = choices::Color::style(choices::Color::Green)
             )),
         Arg::new("iteration-max")
             .short('i')
