@@ -105,6 +105,7 @@ impl BioSquare {
     pub fn reset(&mut self) -> &mut Self {
         let (nrows, ncols) = self.current.shape();
         self.current = self.creator.create(nrows, ncols);
+        self.current.overwrite(&mut self.next.lock().unwrap());
         self
     }
 }
