@@ -115,6 +115,7 @@ class Screen:
             self.biosquare.generate()
             self.iterno += 1
             while self.timer.check() - start < frame_duration_min:
-                pass
+                if recv_sigint:
+                    break
 
         self.display(is_last_frame=True)
