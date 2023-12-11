@@ -44,7 +44,7 @@ impl Timer {
     pub const NANOS_PER_MILLI: u128 = Duration::from_millis(1).as_nanos();
     pub const NANOS_PER_MICRO: u128 = Duration::from_micros(1).as_nanos();
 
-    const FMT_SEP: &str = " - ";
+    const FMT_SEP: &'static str = " - ";
 
     pub fn new() -> Self {
         Self {
