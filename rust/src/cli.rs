@@ -31,15 +31,15 @@ pub fn build() -> Command {
             .value_parser(|s: &str| -> Result<f64, String> {
                 let f: f64 = s.parse().map_err(|_| format!("`{s}` is not a number"))?;
                 if f.is_nan() {
-                    Err(
+                    return Err(
                         "value cannot be NaN, stop testing thoes strange corner cases!".to_string(),
-                    )?
+                    );
                 }
                 if f.is_sign_negative() {
-                    Err("value cannot be negative".to_string())?
+                    return Err("value cannot be negative".to_string());
                 }
                 if f > 1.0 {
-                    Err("value cannot be greater than 1".to_string())?
+                    return Err("value cannot be greater than 1".to_string());
                 }
                 Ok(f)
             })
@@ -92,12 +92,12 @@ pub fn build() -> Command {
             .value_parser(|s: &str| -> Result<f64, String> {
                 let f: f64 = s.parse().map_err(|_| format!("`{s}` is not a number"))?;
                 if f.is_nan() {
-                    Err(
+                    return Err(
                         "value cannot be NaN, stop testing thoes strange corner cases!".to_string(),
-                    )?
+                    );
                 }
                 if f.is_sign_negative() {
-                    Err("value cannot be negative".to_string())?
+                    return Err("value cannot be negative".to_string());
                 }
                 Ok(f)
             })
