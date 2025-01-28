@@ -71,7 +71,7 @@ def style_color_choices(default: str) -> str:
     "-c",
     "--ncols",
     metavar="INTEGER",
-    type=click.IntRange(min=1),
+    type=click.IntRange(min=0),
     default=32,
     show_default=True,
     help="Number of columns.",
