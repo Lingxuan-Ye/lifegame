@@ -1,13 +1,12 @@
-# Lifegame
+# LifeGame
 
-This repository contains implementations of the classic cellular automaton, Conway's Game of Life, in multiple programming languages.
+[![Crates.io](https://img.shields.io/crates/v/lifegame.svg)](https://crates.io/crates/lifegame)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-## Implemented Languages
+A simple implementation of the classic cellular automaton, Conway's Game of Life.
 
-- [Python](./python/)
-- [Rust](./rust/)
-- ...
+## Installation
 
-## License
-
-`lifegame` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+```
+cargo install lifegame
+```
