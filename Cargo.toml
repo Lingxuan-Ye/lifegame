@@ -10,4 +10,5 @@ license = "MIT"
 description = "A simple implementation of the classic cellular automaton, Conway's Game of Life."
 
 [dependencies]
+crossterm = "0.29.0"
 matreex = { version = "0.28.5", default-features = false }
