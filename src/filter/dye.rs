@@ -2,6 +2,7 @@ use super::Filter;
 use crate::cell::Cell;
 use crossterm::style::{Color, StyledContent, Stylize};
 use rand::seq::IteratorRandom;
+use std::sync::LazyLock;
 
 const PLACEHOLDER: &str = "  ";
 const COLORS: [Color; 7] = [
@@ -13,6 +14,7 @@ const COLORS: [Color; 7] = [
     Color::Cyan,
     Color::White,
 ];
+static PRESET: LazyLock<Dye> = LazyLock::new(|| Dye::new(Color::Green, Color::White));
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Dye {
@@ -34,11 +36,9 @@ impl Dye {
         let alive = pair[1];
         Dye::new(dead, alive)
     }
-}
 
-impl Default for Dye {
-    fn default() -> Self {
-        Dye::new(Color::Green, Color::White)
+    pub fn preset() -> &'static Self {
+        &PRESET
     }
 }
 
