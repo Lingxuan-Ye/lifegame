@@ -5,3 +5,12 @@ version = 4
 [[package]]
 name = "lifegame"
 version = "0.2.1"
+dependencies = [
+ "matreex",
+]
+
+[[package]]
+name = "matreex"
+version = "0.28.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afeaa9f265b70507906237a83712f67b53c388e178c61aa5ebf979244654c652"
