@@ -26,7 +26,7 @@ impl Random {
         ensure!(
             (0.0..=1.0).contains(&density),
             "'{}' must be between 0 and 1",
-            "density".identifier()
+            "density".parameter()
         );
         self.density = Some(density);
         Ok(self)

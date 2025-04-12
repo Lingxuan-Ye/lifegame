@@ -5,7 +5,7 @@ pub trait StylizeExt: Stylize {
         self.blue()
     }
 
-    fn identifier(self) -> Self::Styled {
+    fn parameter(self) -> Self::Styled {
         self.yellow()
     }
 }
