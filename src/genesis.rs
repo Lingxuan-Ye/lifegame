@@ -8,18 +8,16 @@ use std::hash::Hash;
 
 #[derive(Clone, Debug)]
 pub struct Random {
-    shape: Shape,
-    density: Option<f64>,
+    density: f64,
     seeder: Option<Seeder>,
 }
 
 impl Random {
-    pub fn new(shape: Shape) -> Result<Self> {
-        Ok(Self {
-            shape,
-            density: None,
+    pub fn new() -> Self {
+        Self {
+            density: 0.5,
             seeder: None,
-        })
+        }
     }
 
     pub fn density(mut self, density: f64) -> Result<Self> {
@@ -28,7 +26,7 @@ impl Random {
             "'{}' must be between 0 and 1",
             "density".parameter()
         );
-        self.density = Some(density);
+        self.density = density;
         Ok(self)
     }
 
@@ -49,10 +47,8 @@ impl Random {
             Some(mut seeder) => seeder.into_rng(),
         };
 
-        let density = self.density.unwrap_or(0.5);
-
         Matrix::with_initializer(shape, |_| {
-            if rng.random_bool(density) {
+            if rng.random_bool(self.density) {
                 Cell::Alive
             } else {
                 Cell::Dead
