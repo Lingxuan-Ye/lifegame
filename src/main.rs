@@ -3,5 +3,6 @@ mod cell;
 mod filter;
 mod genesis;
 mod style;
+mod timer;
 
 fn main() {}
