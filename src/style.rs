@@ -12,10 +12,6 @@ pub trait StylizeExt: Stylize {
     fn key(self) -> Self::Styled {
         self.bold()
     }
-
-    fn unit(self) -> Self::Styled {
-        self.dim()
-    }
 }
 
 impl<T: Stylize> StylizeExt for T {}
