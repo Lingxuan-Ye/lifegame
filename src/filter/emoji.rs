@@ -20,7 +20,7 @@ impl Emoji {
         let Some(alive) = ALIVE_SYMBOLS.chars().choose(&mut rng) else {
             unreachable!()
         };
-        Emoji { dead, alive }
+        Self { dead, alive }
     }
 }
 

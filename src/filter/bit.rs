@@ -1,16 +1,6 @@
 use super::Filter;
 use crate::cell::Cell;
 use crossterm::style::{StyledContent, Stylize};
-use std::sync::LazyLock;
-
-static HALF_WIDTH: LazyLock<Bit> = LazyLock::new(|| Bit {
-    dead: '0'.green().bold().dim(),
-    alive: '1'.green().bold(),
-});
-static FULL_WIDTH: LazyLock<Bit> = LazyLock::new(|| Bit {
-    dead: '０'.green().bold().dim(),
-    alive: '１'.green().bold(),
-});
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Bit {
@@ -19,12 +9,16 @@ pub struct Bit {
 }
 
 impl Bit {
-    pub fn half_width() -> &'static Self {
-        &HALF_WIDTH
+    pub fn half_width() -> Self {
+        let dead = '0'.green().bold().dim();
+        let alive = '1'.green().bold();
+        Self { dead, alive }
     }
 
-    pub fn full_width() -> &'static Self {
-        &FULL_WIDTH
+    pub fn full_width() -> Self {
+        let dead = '０'.green().bold().dim();
+        let alive = '１'.green().bold();
+        Self { dead, alive }
     }
 }
 
