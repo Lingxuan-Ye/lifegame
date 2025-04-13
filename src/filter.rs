@@ -1,3 +1,8 @@
+pub use bit::Bit;
+pub use block::Block;
+pub use dye::Dye;
+pub use emoji::Emoji;
+
 use crate::cell::Cell;
 use std::fmt::Display;
 
