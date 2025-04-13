@@ -74,17 +74,21 @@ impl BioSquare {
                 })
                 .count();
 
-            match cell {
+            match self.current[index] {
                 Cell::Dead => {
                     if neighbors == 3 {
                         cell.revive();
                         self.population += 1;
+                    } else {
+                        cell.die();
                     }
                 }
                 Cell::Alive => {
                     if !(2..=3).contains(&neighbors) {
                         cell.die();
                         self.population -= 1;
+                    } else {
+                        cell.revive();
                     }
                 }
             }
