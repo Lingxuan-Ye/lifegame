@@ -1,6 +1,5 @@
 use crate::cell::Cell;
 use matreex::{Matrix, WrappingIndex};
-use std::mem::swap;
 
 #[derive(Clone, Debug)]
 pub struct BioSquare {
@@ -74,27 +73,23 @@ impl BioSquare {
                 })
                 .count();
 
-            match self.current[index] {
+            match cell {
                 Cell::Dead => {
                     if neighbors == 3 {
                         cell.revive();
                         self.population += 1;
-                    } else {
-                        cell.die();
                     }
                 }
                 Cell::Alive => {
                     if !(2..=3).contains(&neighbors) {
                         cell.die();
                         self.population -= 1;
-                    } else {
-                        cell.revive();
                     }
                 }
             }
         }
 
-        swap(&mut self.current, &mut self.next);
+        self.current.overwrite(&self.next);
 
         self
     }
