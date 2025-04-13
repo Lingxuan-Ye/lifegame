@@ -1,4 +1,3 @@
-use crate::style::StylizeExt;
 use std::fmt;
 use std::time::{Duration, Instant};
 
@@ -73,13 +72,6 @@ impl fmt::Display for Elapsed {
         let micros = nanos / NANOS_PER_MICRO;
         nanos %= NANOS_PER_MICRO;
 
-        write!(
-            f,
-            "{secs:>} {} {millis:>03} {} {micros:>03} {} {nanos:>03} {}",
-            "s".unit(),
-            "ms".unit(),
-            "μs".unit(),
-            "ns".unit(),
-        )
+        write!(f, "{secs} s {millis:>03} ms {micros:>03} μs {nanos:>03} ns")
     }
 }
