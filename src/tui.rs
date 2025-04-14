@@ -27,12 +27,12 @@ where
     F: Filter,
     O: Write,
 {
-    pub fn new(genesis: Matrix<Cell>, filter: F, output: O, show_stats: bool) -> Self {
+    pub fn new(genesis: Matrix<Cell>, filter: F, output: O) -> Self {
         Self {
             biosquare: BioSquare::new(genesis),
             filter,
             output,
-            show_stats,
+            show_stats: false,
             frame_timer: Timer::start(),
             global_timer: Timer::start(),
         }
