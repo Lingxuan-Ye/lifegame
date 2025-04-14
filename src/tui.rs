@@ -7,6 +7,7 @@ use anyhow::Result;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
+use std::num::NonZero;
 
 #[derive(Clone, Debug)]
 pub struct Tui<F, O>
@@ -18,6 +19,7 @@ where
     filter: F,
     output: O,
     show_stats: bool,
+    fps_max: Option<NonZero<u64>>,
     frame_timer: Timer,
     global_timer: Timer,
 }
@@ -33,6 +35,7 @@ where
             filter,
             output,
             show_stats: false,
+            fps_max: None,
             frame_timer: Timer::start(),
             global_timer: Timer::start(),
         }
@@ -45,6 +48,11 @@ where
 
     pub fn hide_stats(&mut self) -> &mut Self {
         self.show_stats = false;
+        self
+    }
+
+    pub fn set_fps_max(&mut self, fps_max: NonZero<u64>) -> &mut Self {
+        self.fps_max = Some(fps_max);
         self
     }
 
