@@ -3,11 +3,10 @@ use crate::cell::Cell;
 use crate::filter::Filter;
 use crate::style::StylizeExt;
 use crate::timer::Timer;
-use anyhow::Result;
+use anyhow::{Result, ensure};
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
-use std::num::NonZero;
 
 #[derive(Clone, Debug)]
 pub struct Tui<F, O>
@@ -19,7 +18,7 @@ where
     filter: F,
     output: O,
     show_stats: bool,
-    fps_max: Option<NonZero<u64>>,
+    fps_max: f64,
     frame_timer: Timer,
     global_timer: Timer,
 }
@@ -35,7 +34,7 @@ where
             filter,
             output,
             show_stats: false,
-            fps_max: None,
+            fps_max: f64::INFINITY,
             frame_timer: Timer::start(),
             global_timer: Timer::start(),
         }
@@ -51,9 +50,13 @@ where
         self
     }
 
-    pub fn set_fps_max(&mut self, fps_max: NonZero<u64>) -> &mut Self {
-        self.fps_max = Some(fps_max);
-        self
+    pub fn set_fps_max(&mut self, fps_max: f64) -> Result<&mut Self> {
+        ensure!(
+            (0.0..=f64::INFINITY).contains(&fps_max),
+            "value cannot be NaN or negative",
+        );
+        self.fps_max = fps_max;
+        Ok(self)
     }
 
     pub fn run(&mut self) -> Result<&mut Self> {

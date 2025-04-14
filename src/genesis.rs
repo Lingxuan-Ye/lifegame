@@ -1,5 +1,4 @@
 use crate::cell::Cell;
-use crate::style::StylizeExt;
 use anyhow::{Result, ensure};
 use matreex::{Matrix, Shape};
 use rand::{Rng, SeedableRng};
@@ -23,8 +22,7 @@ impl Random {
     pub fn density(mut self, density: f64) -> Result<Self> {
         ensure!(
             (0.0..=1.0).contains(&density),
-            "'{}' must be between 0 and 1",
-            "density".parameter()
+            "value must be between 0 and 1"
         );
         self.density = density;
         Ok(self)
