@@ -146,10 +146,11 @@ where
 {
     fn enter_alternate_screen(&mut self) -> Result<&mut Self> {
         self.output
-            .queue(cursor::Hide)?
             .queue(terminal::SetTitle("Lifegame"))?
+            .queue(cursor::Hide)?
             .queue(terminal::EnterAlternateScreen)?
             .queue(terminal::DisableLineWrap)?
+            .queue(terminal::Clear(terminal::ClearType::All))?
             .flush()?;
 
         terminal::enable_raw_mode()?;
