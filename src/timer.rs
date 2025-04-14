@@ -1,4 +1,3 @@
-use std::fmt;
 use std::time::{Duration, Instant};
 
 const NANOS_PER_SEC: u128 = Duration::from_secs(1).as_nanos();
@@ -16,8 +15,8 @@ impl Timer {
         Self { timezero }
     }
 
-    pub fn elapsed(&self) -> Elapsed {
-        Elapsed(self.timezero.elapsed())
+    pub fn elapsed(&self) -> Duration {
+        self.timezero.elapsed()
     }
 
     pub fn reset(&mut self) -> &mut Self {
@@ -25,7 +24,7 @@ impl Timer {
         self
     }
 
-    pub fn pause(&mut self) -> PausedTimer {
+    pub fn pause(&mut self) -> PausedTimer<'_> {
         let timezero = Instant::now();
         let timer = self;
         PausedTimer { timezero, timer }
@@ -39,8 +38,8 @@ pub struct PausedTimer<'a> {
 }
 
 impl PausedTimer<'_> {
-    pub fn elapsed(&self) -> Elapsed {
-        Elapsed(self.timezero.elapsed())
+    pub fn elapsed(&self) -> Duration {
+        self.timezero.elapsed()
     }
 }
 
@@ -50,28 +49,17 @@ impl Drop for PausedTimer<'_> {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct Elapsed(Duration);
+pub fn fmt_duration(duration: Duration) -> String {
+    let mut nanos = duration.as_nanos();
 
-impl Elapsed {
-    pub fn duration(&self) -> Duration {
-        self.0
-    }
-}
+    let secs = nanos / NANOS_PER_SEC;
+    nanos %= NANOS_PER_SEC;
 
-impl fmt::Display for Elapsed {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut nanos = self.duration().as_nanos();
+    let millis = nanos / NANOS_PER_MILLI;
+    nanos %= NANOS_PER_MILLI;
 
-        let secs = nanos / NANOS_PER_SEC;
-        nanos %= NANOS_PER_SEC;
+    let micros = nanos / NANOS_PER_MICRO;
+    nanos %= NANOS_PER_MICRO;
 
-        let millis = nanos / NANOS_PER_MILLI;
-        nanos %= NANOS_PER_MILLI;
-
-        let micros = nanos / NANOS_PER_MICRO;
-        nanos %= NANOS_PER_MICRO;
-
-        write!(f, "{secs} s {millis:>03} ms {micros:>03} μs {nanos:>03} ns")
-    }
+    format!("{secs} s {millis:>03} ms {micros:>03} μs {nanos:>03} ns")
 }

@@ -12,7 +12,7 @@ pub struct Emoji {
 }
 
 impl Emoji {
-    pub  fn random() -> Self {
+    pub fn random() -> Self {
         let mut rng = rand::rng();
         let Some(dead) = DEAD_SYMBOLS.chars().choose(&mut rng) else {
             unreachable!()
