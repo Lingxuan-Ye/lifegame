@@ -38,6 +38,16 @@ where
         }
     }
 
+    pub fn show_stats(&mut self) -> &mut Self {
+        self.show_stats = true;
+        self
+    }
+
+    pub fn hide_stats(&mut self) -> &mut Self {
+        self.show_stats = false;
+        self
+    }
+
     pub fn run(&mut self) -> Result<&mut Self> {
         self.enter_alternate_screen()?;
 
