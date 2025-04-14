@@ -94,3 +94,13 @@ impl BioSquare {
         self
     }
 }
+
+impl Iterator for BioSquare {
+    type Item = Matrix<Cell>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let matrix = self.observe().clone();
+        self.evolve();
+        Some(matrix)
+    }
+}
