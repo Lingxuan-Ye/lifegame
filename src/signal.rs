@@ -1,15 +1,17 @@
 use crate::error::QuitOnError;
 use crossterm::event::{Event, KeyCode, KeyModifiers, read};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Condvar, Mutex, MutexGuard};
+use std::sync::{Condvar, Mutex, MutexGuard, Once};
 use std::thread;
 
-pub static RESET : AtomicBool = AtomicBool::new(false);
+pub static RESET: AtomicBool = AtomicBool::new(false);
 pub static PAUSE: Pause = Pause::new();
 pub static QUIT: AtomicBool = AtomicBool::new(false);
 
-pub fn spawn_listener() {
-    thread::spawn(|| {
+static LISTENER: Once = Once::new();
+
+pub fn setup_listener() {
+    let handler = || {
         loop {
             let event = read().quit_on_error();
 
@@ -26,7 +28,7 @@ pub fn spawn_listener() {
             match key.to_ascii_lowercase() {
                 'r' => {
                     RESET.store(true, Ordering::Relaxed);
-                },
+                }
                 'p' => {
                     PAUSE.toggle();
                 }
@@ -43,7 +45,11 @@ pub fn spawn_listener() {
                 _ => (),
             }
         }
-    });
+    };
+
+    LISTENER.call_once(|| {
+        thread::spawn(handler);
+    })
 }
 
 #[derive(Debug)]
