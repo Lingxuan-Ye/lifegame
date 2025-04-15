@@ -4,7 +4,7 @@ use crossterm::style::{Color, StyledContent, Stylize};
 use rand::seq::IteratorRandom;
 
 const PLACEHOLDER: &str = "  ";
-const COLORS: [Color; 7] = [
+const CHOICES: [Color; 7] = [
     Color::Red,
     Color::Green,
     Color::Yellow,
@@ -29,7 +29,7 @@ impl Dye {
 
     pub fn random() -> Self {
         let mut rng = rand::rng();
-        let pair = COLORS.into_iter().choose_multiple(&mut rng, 2);
+        let pair = CHOICES.into_iter().choose_multiple(&mut rng, 2);
         let dead = pair[0];
         let alive = pair[1];
         Self::new(dead, alive)
