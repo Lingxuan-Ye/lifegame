@@ -31,10 +31,12 @@ pub fn spawn_listener() {
                     PAUSE.toggle();
                 }
                 'q' => {
+                    PAUSE.unpause();
                     QUIT.store(true, Ordering::Relaxed);
                     break;
                 }
                 'c' if key_event.modifiers == KeyModifiers::CONTROL => {
+                    PAUSE.unpause();
                     QUIT.store(true, Ordering::Relaxed);
                     break;
                 }
