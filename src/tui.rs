@@ -87,14 +87,14 @@ where
 
             self.wait_if_paused();
 
+            if self.should_quit() {
+                break Ok(());
+            }
+
             while self.frame_timer.elapsed().as_secs_f64() < frame_duration {
                 if self.should_quit() {
                     break 'outer Ok(());
                 }
-            }
-
-            if self.should_quit() {
-                break Ok(());
             }
         };
 
