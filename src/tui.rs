@@ -72,8 +72,6 @@ where
     pub fn run(&mut self) -> Result<&mut Self> {
         self.enter_alternate_screen()?;
 
-        let frame_duration = 1.0 / self.fps_max;
-
         let result = 'outer: loop {
             if let Err(error) = self.render() {
                 break Err(error);
@@ -91,7 +89,7 @@ where
                 break Ok(());
             }
 
-            while self.frame_timer.elapsed().as_secs_f64() < frame_duration {
+            while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration() {
                 if self.should_quit() {
                     break 'outer Ok(());
                 }
@@ -195,6 +193,10 @@ where
 
     fn should_quit(&mut self) -> bool {
         signal::QUIT.load(Ordering::Relaxed)
+    }
+
+    fn frame_duration(&self) -> f64 {
+        signal::TIME_SCALE.scale() / self.fps_max
     }
 
     fn enter_alternate_screen(&mut self) -> Result<&mut Self> {
