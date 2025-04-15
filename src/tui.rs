@@ -16,6 +16,7 @@ where
     F: Filter,
     O: Write,
 {
+    genesis: Matrix<Cell>,
     biosquare: BioSquare,
     filter: F,
     output: O,
@@ -31,14 +32,21 @@ where
     O: Write,
 {
     pub fn new(genesis: Matrix<Cell>, filter: F, output: O) -> Self {
+        let biosquare = BioSquare::new(genesis.clone());
+        let show_stats = false;
+        let fps_max = f64::INFINITY;
+        let global_timer = Timer::start();
+        let frame_timer = Timer::start();
+
         Self {
-            biosquare: BioSquare::new(genesis),
+            genesis,
+            biosquare,
             filter,
             output,
-            show_stats: false,
-            fps_max: f64::INFINITY,
-            global_timer: Timer::start(),
-            frame_timer: Timer::start(),
+            show_stats,
+            fps_max,
+            global_timer,
+            frame_timer,
         }
     }
 
@@ -73,13 +81,17 @@ where
             self.frame_timer.reset();
             self.biosquare.evolve();
 
+            if self.should_reset() {
+                self.reset();
+            }
+
+            self.wait_if_paused();
+
             while self.frame_timer.elapsed().as_secs_f64() < frame_duration {
                 if self.should_quit() {
                     break 'outer Ok(());
                 }
             }
-
-            self.wait_if_paused();
 
             if self.should_quit() {
                 break Ok(());
@@ -158,6 +170,18 @@ where
             .queue(cursor::MoveToNextLine(1))?;
 
         Ok(self)
+    }
+
+    fn should_reset(&mut self) -> bool {
+        signal::RESET.load(Ordering::Relaxed)
+    }
+
+    fn reset(&mut self) -> &mut Self {
+        signal::RESET.store(false, Ordering::Relaxed);
+        self.biosquare = BioSquare::new(self.genesis.clone());
+        self.global_timer.reset();
+        self.frame_timer.reset();
+        self
     }
 
     fn wait_if_paused(&mut self) -> &mut Self {
