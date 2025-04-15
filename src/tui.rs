@@ -2,9 +2,9 @@ use crate::biosquare::BioSquare;
 use crate::cell::Cell;
 use crate::filter::Filter;
 use crate::signal;
-use crate::style::StylizeExt;
 use crate::timer::{Timer, fmt_duration};
 use anyhow::{Result, ensure};
+use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
@@ -165,7 +165,7 @@ where
         let value = format!("{:>VALUE_WIDTH$}", value);
 
         self.output
-            .queue(style::Print(key.key()))?
+            .queue(style::Print(key.bold()))?
             .queue(style::Print(value))?
             .queue(cursor::MoveToNextLine(1))?;
 
