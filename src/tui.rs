@@ -79,6 +79,12 @@ where
             self.frame_timer.reset();
             self.biosquare.evolve();
 
+            while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration() {
+                if self.should_quit() {
+                    break 'outer Ok(());
+                }
+            }
+
             if self.should_reset() {
                 self.reset();
             }
@@ -87,12 +93,6 @@ where
 
             if self.should_quit() {
                 break Ok(());
-            }
-
-            while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration() {
-                if self.should_quit() {
-                    break 'outer Ok(());
-                }
             }
         };
 
