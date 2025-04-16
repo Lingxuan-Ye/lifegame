@@ -34,7 +34,7 @@ where
     pub fn new(genesis: Matrix<Cell>, filter: F, output: O) -> Self {
         let biosquare = BioSquare::new(genesis.clone());
         let show_stats = false;
-        let fps_max = f64::INFINITY;
+        let fps_max = 60.0;
         let global_timer = Timer::start();
         let frame_timer = Timer::start();
 
