@@ -8,7 +8,6 @@ use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
-use std::sync::atomic::Ordering;
 
 #[derive(Clone, Debug)]
 pub struct Tui<F, O>
@@ -80,18 +79,18 @@ where
             self.biosquare.evolve();
 
             while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration() {
-                if self.should_quit() {
+                if signal::QUIT.get() {
                     break 'outer Ok(());
                 }
             }
 
-            if self.should_reset() {
+            if signal::RESET.take() {
                 self.reset();
             }
 
             self.wait_if_paused();
 
-            if self.should_quit() {
+            if signal::QUIT.get() {
                 break Ok(());
             }
         };
@@ -170,12 +169,7 @@ where
         Ok(self)
     }
 
-    fn should_reset(&mut self) -> bool {
-        signal::RESET.load(Ordering::Relaxed)
-    }
-
     fn reset(&mut self) -> &mut Self {
-        signal::RESET.store(false, Ordering::Relaxed);
         self.biosquare = BioSquare::new(self.genesis.clone());
         self.global_timer.reset();
         self.frame_timer.reset();
@@ -189,10 +183,6 @@ where
         drop(global_timer);
         drop(frame_timer);
         self
-    }
-
-    fn should_quit(&mut self) -> bool {
-        signal::QUIT.load(Ordering::Relaxed)
     }
 
     fn frame_duration(&self) -> f64 {
