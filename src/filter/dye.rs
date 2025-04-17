@@ -21,9 +21,35 @@ pub struct Dye {
 }
 
 impl Dye {
-    pub fn new(dead: Color, alive: Color) -> Self {
+    pub fn new(dead: Option<Color>, alive: Option<Color>) -> Self {
+        let mut buffer = [Color::Reset; 2];
+
+        CHOICES
+            .into_iter()
+            .choose_multiple_fill(&mut rand::rng(), &mut buffer);
+
+        let (dead, alive) = match (dead, alive) {
+            (None, None) => (buffer[0], buffer[1]),
+            (None, Some(alive)) => {
+                if buffer[0] != alive {
+                    (buffer[0], alive)
+                } else {
+                    (buffer[1], alive)
+                }
+            }
+            (Some(dead), None) => {
+                if buffer[0] != dead {
+                    (dead, buffer[0])
+                } else {
+                    (dead, buffer[1])
+                }
+            }
+            (Some(dead), Some(alive)) => (dead, alive),
+        };
+
         let dead = PLACEHOLDER.on(dead);
         let alive = PLACEHOLDER.on(alive);
+
         Self { dead, alive }
     }
 
