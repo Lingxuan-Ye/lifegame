@@ -19,10 +19,10 @@ where
     biosquare: BioSquare,
     filter: F,
     output: O,
-    show_stats: bool,
     fps_max: f64,
     global_timer: Timer,
     frame_timer: Timer,
+    show_stats: bool,
 }
 
 impl<F, O> Tui<F, O>
@@ -32,21 +32,30 @@ where
 {
     pub fn new(genesis: Matrix<Cell>, filter: F, output: O) -> Self {
         let biosquare = BioSquare::new(genesis.clone());
-        let show_stats = false;
         let fps_max = 60.0;
         let global_timer = Timer::start();
         let frame_timer = Timer::start();
+        let show_stats = false;
 
         Self {
             genesis,
             biosquare,
             filter,
             output,
-            show_stats,
             fps_max,
             global_timer,
             frame_timer,
+            show_stats,
         }
+    }
+
+    pub fn set_fps_max(&mut self, fps_max: f64) -> Result<&mut Self> {
+        ensure!(
+            (0.0..=f64::INFINITY).contains(&fps_max),
+            "value cannot be NaN or negative",
+        );
+        self.fps_max = fps_max;
+        Ok(self)
     }
 
     pub fn show_stats(&mut self) -> &mut Self {
@@ -57,15 +66,6 @@ where
     pub fn hide_stats(&mut self) -> &mut Self {
         self.show_stats = false;
         self
-    }
-
-    pub fn set_fps_max(&mut self, fps_max: f64) -> Result<&mut Self> {
-        ensure!(
-            (0.0..=f64::INFINITY).contains(&fps_max),
-            "value cannot be NaN or negative",
-        );
-        self.fps_max = fps_max;
-        Ok(self)
     }
 
     pub fn run(&mut self) -> Result<&mut Self> {
