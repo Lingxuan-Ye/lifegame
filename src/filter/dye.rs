@@ -52,20 +52,6 @@ impl Dye {
 
         Self { dead, alive }
     }
-
-    pub fn random() -> Self {
-        let mut rng = rand::rng();
-        let pair = CHOICES.into_iter().choose_multiple(&mut rng, 2);
-        let dead = pair[0];
-        let alive = pair[1];
-        Self::new(dead, alive)
-    }
-}
-
-impl Default for Dye {
-    fn default() -> Self {
-        Self::new(Color::Green, Color::White)
-    }
 }
 
 impl Filter for Dye {
