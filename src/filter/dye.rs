@@ -4,7 +4,8 @@ use crossterm::style::{Color, StyledContent, Stylize};
 use rand::seq::IteratorRandom;
 
 const PLACEHOLDER: &str = "  ";
-const CHOICES: [Color; 7] = [
+const CHOICES: [Color; 8] = [
+    Color::Black,
     Color::Red,
     Color::Green,
     Color::Yellow,
