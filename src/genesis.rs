@@ -46,13 +46,7 @@ impl Random {
             Some(seeder) => seeder.into_rng(),
         };
 
-        Matrix::with_initializer(shape, |_| {
-            if rng.random_bool(self.density) {
-                Cell::Alive
-            } else {
-                Cell::Dead
-            }
-        })
-        .map_err(Into::into)
+        Matrix::with_initializer(shape, |_| rng.random_bool(self.density).into())
+            .map_err(Into::into)
     }
 }

@@ -19,3 +19,9 @@ impl Cell {
         self
     }
 }
+
+impl From<bool> for Cell {
+    fn from(value: bool) -> Self {
+        if value { Self::Alive } else { Self::Dead }
+    }
+}
