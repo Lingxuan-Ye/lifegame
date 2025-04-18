@@ -5,10 +5,6 @@ pub enum Cell {
 }
 
 impl Cell {
-    pub fn is_dead(&self) -> bool {
-        *self == Self::Dead
-    }
-
     pub fn is_alive(&self) -> bool {
         *self == Self::Alive
     }
