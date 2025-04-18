@@ -17,3 +17,8 @@ matreex = { version = "0.29.0", default-features = false }
 rand = "0.9.0"
 rand_chacha = "0.9.0"
 rand_seeder = "0.4.0"
+
+[profile.release]
+strip = true
+lto = true
+panic = "abort"
