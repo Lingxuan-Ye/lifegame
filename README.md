@@ -10,3 +10,39 @@ A simple implementation of the classic cellular automaton, Conway's Game of Life
 ```
 cargo install lifegame
 ```
+
+## Usage
+
+Create a world with 80×100 cells:
+
+```
+lifegame --nrows 80 --ncols 100
+```
+
+Apply classic *Matrix*-style filter:
+
+```
+lifegame --filter bit
+```
+
+Emojify the world:
+
+```
+lifegame --filter emoji
+```
+
+Get help:
+
+```
+lifegame --help
+```
+
+## Keymap
+
+| Key | Action            |
+| --- | ----------------- |
+| `j` | Slow down by half |
+| `k` | Speed up by twice |
+| `r` | Reset world       |
+| `p` | Toggle pause      |
+| `q` | Quit the game     |
