@@ -1,0 +1,19 @@
+[package]
+name = "lifegame"
+version = "0.3.0"
+edition = "2024"
+authors = ["Lingxuan Ye <love@lingxuan.io>"]
+categories = ["command-line-utilities"]
+repository = "https://github.com/Lingxuan-Ye/lifegame"
+readme = "README.md"
+license = "MIT"
+description = "A simple implementation of the classic cellular automaton, Conway's Game of Life."
+
+[dependencies]
+anyhow = "1.0.97"
+clap = { version = "4.5.36", features = ["cargo", "derive"] }
+crossterm = "0.29.0"
+matreex = { version = "0.29.0", default-features = false }
+rand = "0.9.0"
+rand_chacha = "0.9.0"
+rand_seeder = "0.4.0"
