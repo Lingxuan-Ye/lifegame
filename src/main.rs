@@ -20,7 +20,7 @@ mod signal;
 mod timer;
 mod tui;
 
-fn execute() -> Result<()> {
+fn run() -> Result<()> {
     setup_listener();
 
     let args = Args::parse();
@@ -65,5 +65,5 @@ fn execute() -> Result<()> {
 }
 
 fn main() {
-    execute().quit_on_error();
+    run().quit_on_error();
 }
