@@ -45,7 +45,7 @@ impl PausedTimer<'_> {
 
 impl Drop for PausedTimer<'_> {
     fn drop(&mut self) {
-        self.timer.timezero += self.timezero.elapsed();
+        self.timer.timezero += self.elapsed();
     }
 }
 
