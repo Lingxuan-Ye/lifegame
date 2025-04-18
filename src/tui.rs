@@ -10,27 +10,24 @@ use matreex::Matrix;
 use std::io::Write;
 
 #[derive(Clone, Debug)]
-pub struct Tui<F, O>
+pub struct Tui<O>
 where
-    F: Filter,
     O: Write,
 {
     genesis: Matrix<Cell>,
     biosquare: BioSquare,
-    filter: F,
-    output: O,
     fps_max: f64,
     global_timer: Timer,
     frame_timer: Timer,
     show_stats: bool,
+    output: O,
 }
 
-impl<F, O> Tui<F, O>
+impl<O> Tui<O>
 where
-    F: Filter,
     O: Write,
 {
-    pub fn new(genesis: Matrix<Cell>, filter: F, output: O) -> Self {
+    pub fn new(genesis: Matrix<Cell>, output: O) -> Self {
         let biosquare = BioSquare::new(genesis.clone());
         let fps_max = 60.0;
         let global_timer = Timer::start();
@@ -40,12 +37,11 @@ where
         Self {
             genesis,
             biosquare,
-            filter,
-            output,
             fps_max,
             global_timer,
             frame_timer,
             show_stats,
+            output,
         }
     }
 
@@ -68,11 +64,14 @@ where
         self
     }
 
-    pub fn run(&mut self) -> Result<&mut Self> {
+    pub fn run<F>(&mut self, filter: &F) -> Result<&mut Self>
+    where
+        F: Filter,
+    {
         self.enter_alternate_screen()?;
 
         let result = 'outer: loop {
-            if let Err(error) = self.render() {
+            if let Err(error) = self.render(filter) {
                 break Err(error);
             }
             self.frame_timer.reset();
@@ -102,7 +101,10 @@ where
         Ok(self)
     }
 
-    fn render(&mut self) -> Result<&mut Self> {
+    fn render<F>(&mut self, filter: &F) -> Result<&mut Self>
+    where
+        F: Filter,
+    {
         self.output
             .queue(terminal::BeginSynchronizedUpdate)?
             .queue(cursor::MoveTo(0, 0))?;
@@ -111,7 +113,7 @@ where
 
         for row in matrix.iter_rows() {
             for cell in row {
-                let view = self.filter.filter(*cell);
+                let view = filter.filter(*cell);
                 self.output.queue(style::Print(view))?;
             }
             self.output.queue(cursor::MoveToNextLine(1))?;
