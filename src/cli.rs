@@ -41,7 +41,7 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("DECIMAL")
                 .value_parser(value_parser!(f64))
                 .default_value("0.5")
-                .help("Initial population density (0.5 if out of range 0.0..=1.0)"),
+                .help("Initial population density (use default if out of range 0.0..=1.0)"),
             Arg::new("filter")
                 .long("filter")
                 .value_name("FILTER")
@@ -82,7 +82,7 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("DECIMAL")
                 .value_parser(value_parser!(f64))
                 .default_value("60.0")
-                .help("Maximum fps (default value if out of range 0.0..=f64::INFINITY)"),
+                .help("Maximum fps (use default if out of range 0.0..=f64::INFINITY)"),
             Arg::new("show-stats")
                 .long("show-stats")
                 .action(ArgAction::SetTrue)
