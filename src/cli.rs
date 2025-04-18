@@ -78,8 +78,8 @@ pub struct Args {
     pub seed: Option<&'static str>,
     pub density: f64,
     pub filter: Filter,
-    pub color_dead: Option<Color>,
-    pub color_alive: Option<Color>,
+    pub color_dead: CrosstermColor,
+    pub color_alive: CrosstermColor,
     pub fps_max: f64,
     pub show_stats: bool,
 }
@@ -93,8 +93,16 @@ impl Args {
         let seed = MATCHES.get_one::<String>("seed").map(Deref::deref);
         let density = MATCHES.get_one::<f64>("density").copied().expect(REASON);
         let filter = MATCHES.get_one::<Filter>("filter").copied().expect(REASON);
-        let color_dead = MATCHES.get_one::<Color>("color-dead").copied();
-        let color_alive = MATCHES.get_one::<Color>("color-alive").copied();
+        let color_dead = MATCHES
+            .get_one::<Color>("color-dead")
+            .copied()
+            .expect(REASON)
+            .into();
+        let color_alive = MATCHES
+            .get_one::<Color>("color-alive")
+            .copied()
+            .expect(REASON)
+            .into();
         let fps_max = MATCHES.get_one::<f64>("fps-max").copied().expect(REASON);
         let show_stats = MATCHES.get_flag("show-stats");
 

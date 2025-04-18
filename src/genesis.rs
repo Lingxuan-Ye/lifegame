@@ -13,13 +13,12 @@ pub struct Random {
 
 impl Random {
     pub fn new() -> Self {
-        Self {
-            density: 0.5,
-            seeder: None,
-        }
+        let density = 0.5;
+        let seeder = None;
+        Self { density, seeder }
     }
 
-    pub fn density(mut self, density: f64) -> Result<Self> {
+    pub fn density(&mut self, density: f64) -> Result<&mut Self> {
         ensure!(
             (0.0..=1.0).contains(&density),
             "value must be between 0 and 1"
@@ -28,30 +27,26 @@ impl Random {
         Ok(self)
     }
 
-    pub fn seed<S>(mut self, seed: S) -> Self
+    pub fn seed<S>(&mut self, seed: Option<S>) -> &mut Self
     where
         S: Hash,
     {
-        self.seeder = Some(Seeder::from(seed));
+        if let Some(seed) = seed {
+            self.seeder = Some(Seeder::from(seed));
+        }
         self
     }
 
-    pub fn generate<R>(self, shape: Shape) -> Result<Matrix<Cell>>
+    pub fn generate<R>(&mut self, shape: Shape) -> Result<Matrix<Cell>>
     where
         R: Rng + SeedableRng,
     {
-        let mut rng: R = match self.seeder {
+        let mut rng: R = match &mut self.seeder {
             None => SeedableRng::try_from_os_rng()?,
-            Some(mut seeder) => seeder.into_rng(),
+            Some(seeder) => seeder.into_rng(),
         };
 
-        Matrix::with_initializer(shape, |_| {
-            if rng.random_bool(self.density) {
-                Cell::Alive
-            } else {
-                Cell::Dead
-            }
-        })
-        .map_err(Into::into)
+        Matrix::with_initializer(shape, |_| rng.random_bool(self.density).into())
+            .map_err(Into::into)
     }
 }

@@ -52,10 +52,7 @@ fn execute() -> Result<()> {
             tui.run(&Block)?;
         }
         Filter::Dye => {
-            let filter = Dye::new(
-                args.color_dead.map(Into::into),
-                args.color_alive.map(Into::into),
-            );
+            let filter = Dye::new(args.color_dead, args.color_alive);
             tui.run(&filter)?;
         }
         Filter::Emoji => {
