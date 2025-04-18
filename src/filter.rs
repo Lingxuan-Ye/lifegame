@@ -2,6 +2,7 @@ pub use bit::Bit;
 pub use block::Block;
 pub use dye::Dye;
 pub use emoji::Emoji;
+pub use hanzi::Hanzi;
 
 use crate::cell::Cell;
 use std::fmt::Display;
@@ -10,6 +11,7 @@ mod bit;
 mod block;
 mod dye;
 mod emoji;
+mod hanzi;
 
 /// Visualizes cells.
 ///

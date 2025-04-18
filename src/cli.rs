@@ -151,6 +151,7 @@ pub enum Filter {
     Block,
     Dye,
     Emoji,
+    Hanzi,
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
