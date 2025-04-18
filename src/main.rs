@@ -1,7 +1,7 @@
 use self::cli::Args;
 use self::cli::Filter;
 use self::error::QuitOnError;
-use self::filter::{Bit, Block, Dye, Emoji};
+use self::filter::{Bit, Block, Dye, Emoji, Hanzi};
 use self::genesis::Random;
 use self::signal::setup_listener;
 use self::tui::Tui;
@@ -20,7 +20,7 @@ mod signal;
 mod timer;
 mod tui;
 
-fn execute() -> Result<()> {
+fn run() -> Result<()> {
     setup_listener();
 
     let args = Args::parse();
@@ -59,11 +59,14 @@ fn execute() -> Result<()> {
             let filter = Emoji::random();
             tui.run(&filter)?;
         }
+        Filter::Hanzi => {
+            tui.run(&Hanzi)?;
+        }
     }
 
     Ok(())
 }
 
 fn main() {
-    execute().quit_on_error();
+    run().quit_on_error();
 }
