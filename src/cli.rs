@@ -25,7 +25,12 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
             //     .value_name("GENESIS")
             //     .value_parser(value_parser!(Genesis))
             //     .default_value("random")
-            //     .help("Method for world initialization"),
+            //     .hide_default_value(true)
+            //     .hide_possible_values(true)
+            //     .help(Genesis::help(
+            //         "Method for world initialization",
+            //         Some(Genesis::Random),
+            //     )),
             Arg::new("seed")
                 .long("seed")
                 .value_name("STRING")
@@ -42,21 +47,36 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("FILTER")
                 .value_parser(value_parser!(Filter))
                 .default_value("dye")
-                .help("Filter to observe the world"),
+                .hide_default_value(true)
+                .hide_possible_values(true)
+                .help(Filter::help(
+                    "Filter to observe the world",
+                    Some(Filter::Dye),
+                )),
             Arg::new("color-dead")
                 .short('D')
                 .long("color-dead")
                 .value_name("COLOR")
                 .value_parser(value_parser!(Color))
                 .default_value("green")
-                .help("Color for dead cells (omit if filter is not dye)"),
+                .hide_default_value(true)
+                .hide_possible_values(true)
+                .help(Color::help(
+                    "Color for dead cells (omit if filter is not dye)",
+                    Some(Color::Green),
+                )),
             Arg::new("color-alive")
                 .short('A')
                 .long("color-alive")
                 .value_name("COLOR")
                 .value_parser(value_parser!(Color))
                 .default_value("white")
-                .help("Color for alive cells (omit if filter is not dye)"),
+                .hide_default_value(true)
+                .hide_possible_values(true)
+                .help(Color::help(
+                    "Color for alive cells (omit if filter is not dye)",
+                    Some(Color::White),
+                )),
             Arg::new("fps-max")
                 .long("fps-max")
                 .value_name("DECIMAL")
@@ -159,3 +179,21 @@ impl From<Color> for CrosstermColor {
         }
     }
 }
+
+trait ValueEnumExt: ValueEnum {
+    fn help(description: &str, default: Option<Self>) -> String {
+        let mut message = description.to_string();
+        if let Some(default) = default.and_then(|variant| variant.to_possible_value()) {
+            message.push_str(&format!(" [default: {}]", default.get_name()));
+        }
+        Self::value_variants()
+            .iter()
+            .filter_map(|variant| variant.to_possible_value())
+            .for_each(|entry| {
+                message.push_str(&format!("\n- {}", entry.get_name()));
+            });
+        message
+    }
+}
+
+impl<T> ValueEnumExt for T where T: ValueEnum {}
