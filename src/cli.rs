@@ -49,14 +49,14 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("COLOR")
                 .value_parser(value_parser!(Color))
                 .default_value("green")
-                .help("Color for dead cells (omit if filter is not dye, random if not specified)"),
+                .help("Color for dead cells (omit if filter is not dye)"),
             Arg::new("color-alive")
                 .short('A')
                 .long("color-alive")
                 .value_name("COLOR")
                 .value_parser(value_parser!(Color))
                 .default_value("white")
-                .help("Color for alive cells (omit if filter is not dye, random if not specified)"),
+                .help("Color for alive cells (omit if filter is not dye)"),
             Arg::new("fps-max")
                 .long("fps-max")
                 .value_name("DECIMAL")
