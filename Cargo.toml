@@ -1,6 +1,6 @@
 [package]
 name = "lifegame"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2024"
 authors = ["Lingxuan Ye <love@lingxuan.io>"]
 categories = ["command-line-utilities"]
@@ -10,10 +10,15 @@ license = "MIT"
 description = "A simple implementation of the classic cellular automaton, Conway's Game of Life."
 
 [dependencies]
-anyhow = "1.0.97"
-clap = { version = "4.5.36", features = ["cargo", "derive"] }
+anyhow = "1.0.98"
+clap = { version = "4.5.37", features = ["cargo", "derive"] }
 crossterm = "0.29.0"
-matreex = { version = "0.29.0", default-features = false }
-rand = "0.9.0"
+matreex = { version = "0.29.1", default-features = false }
+rand = "0.9.1"
 rand_chacha = "0.9.0"
 rand_seeder = "0.4.0"
+
+[profile.release]
+strip = true
+lto = true
+panic = "abort"
