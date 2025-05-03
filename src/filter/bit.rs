@@ -10,8 +10,8 @@ impl Filter for Bit {
 
     fn filter(&self, cell: Cell) -> Self::View {
         match cell {
-            Cell::Dead => " 0".green().bold().dim(),
-            Cell::Alive => " 1".green().bold(),
+            Cell::Dead => "0 ".green().bold().dim(),
+            Cell::Alive => "1 ".green().bold(),
         }
     }
 }
