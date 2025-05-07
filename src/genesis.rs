@@ -31,9 +31,7 @@ impl Random {
     where
         S: Hash,
     {
-        if let Some(seed) = seed {
-            self.seeder = Some(Seeder::from(seed));
-        }
+        self.seeder = seed.map(Seeder::from);
         self
     }
 
