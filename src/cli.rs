@@ -111,7 +111,7 @@ impl Args {
         let nrows = MATCHES.get_one::<usize>("nrows").copied().expect(REASON);
         let ncols = MATCHES.get_one::<usize>("ncols").copied().expect(REASON);
         let seed = MATCHES.get_one::<String>("seed").map(Deref::deref);
-        let density = MATCHES.get_one::<f64>("density").copied().expect(REASON);
+        let mut density = MATCHES.get_one::<f64>("density").copied().expect(REASON);
         let filter = MATCHES.get_one::<Filter>("filter").copied().expect(REASON);
         let color_dead = MATCHES
             .get_one::<Color>("color-dead")
@@ -123,8 +123,15 @@ impl Args {
             .copied()
             .expect(REASON)
             .into();
-        let fps_max = MATCHES.get_one::<f64>("fps-max").copied().expect(REASON);
+        let mut fps_max = MATCHES.get_one::<f64>("fps-max").copied().expect(REASON);
         let show_stats = MATCHES.get_flag("show-stats");
+
+        if !(0.0..=1.0).contains(&density) {
+            density = 0.5;
+        }
+        if !(0.0..=f64::INFINITY).contains(&fps_max) {
+            fps_max = 60.0;
+        }
 
         Self {
             nrows,

@@ -34,9 +34,7 @@ fn run() -> Result<()> {
 
     let mut tui = Tui::new(genesis, output);
 
-    if (0.0..=f64::INFINITY).contains(&args.fps_max) {
-        tui.set_fps_max(args.fps_max)?;
-    }
+    tui.set_fps_max(args.fps_max)?;
 
     if args.show_stats {
         tui.show_stats();
