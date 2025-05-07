@@ -1,6 +1,6 @@
 use anyhow::Error;
 use crossterm::style::Stylize;
-use crossterm::{QueueableCommand, cursor, style};
+use crossterm::{QueueableCommand, style};
 use std::io::{self, Write, stderr};
 use std::process::exit;
 
@@ -49,7 +49,7 @@ where
         };
         stderr
             .queue(style::Print(message))?
-            .queue(cursor::MoveToNextLine(1))?;
+            .queue(style::Print("\n"))?;
     }
 
     stderr.flush()
