@@ -77,7 +77,7 @@ where
             self.frame_timer.reset();
             self.biosquare.evolve();
 
-            while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration() {
+            while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration_min() {
                 if signal::QUIT.get() {
                     break 'outer Ok(());
                 }
@@ -187,7 +187,7 @@ where
         self
     }
 
-    fn frame_duration(&self) -> f64 {
+    fn frame_duration_min(&self) -> f64 {
         signal::TIME_SCALE.scale() / self.fps_max
     }
 
