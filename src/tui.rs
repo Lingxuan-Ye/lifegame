@@ -152,16 +152,16 @@ where
     ///
     /// `value` is a `String` rather than a generic `T: Display` because not
     /// all `T`s support alignment. However, this introduces a small overhead
-    /// due to formatting the value twice.
+    /// due to formatting it twice.
     ///
-    /// Additionally, if `value` contains full-width or non-printable characters,
-    /// it may not align correctly.
+    /// Additionally, `key` and `value` should avoid containing full-width or
+    /// non-printable characters, or the alignment will be incorrect.
     fn render_measurement(&mut self, key: &str, value: String) -> Result<&mut Self> {
         const KEY_WIDTH: usize = 20;
         const VALUE_WIDTH: usize = 40;
 
-        let key = format!("{:<KEY_WIDTH$}", key);
-        let value = format!("{:>VALUE_WIDTH$}", value);
+        let key = format!("{key:<KEY_WIDTH$}");
+        let value = format!("{value:>VALUE_WIDTH$}");
 
         self.output
             .queue(style::Print(key.bold()))?
