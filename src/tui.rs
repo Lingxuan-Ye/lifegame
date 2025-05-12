@@ -3,75 +3,66 @@ use crate::cell::Cell;
 use crate::filter::Filter;
 use crate::signal;
 use crate::timer::{Timer, fmt_duration};
-use anyhow::{Result, ensure};
+use anyhow::Result;
 use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
 
 #[derive(Clone, Debug)]
-pub struct Tui<O>
+pub struct Tui<F, O>
 where
+    F: Filter,
     O: Write,
 {
     genesis: Matrix<Cell>,
     biosquare: BioSquare,
     fps_max: f64,
+    show_stats: bool,
+    filter: F,
+    output: O,
     global_timer: Timer,
     frame_timer: Timer,
-    show_stats: bool,
-    output: O,
 }
 
-impl<O> Tui<O>
+impl<F, O> Tui<F, O>
 where
+    F: Filter,
     O: Write,
 {
-    pub fn new(genesis: Matrix<Cell>, output: O) -> Self {
+    pub fn new(
+        genesis: Matrix<Cell>,
+        fps_max: f64,
+        show_stats: bool,
+        filter: F,
+        output: O,
+    ) -> Self {
         let biosquare = BioSquare::new(genesis.clone());
-        let fps_max = 60.0;
+        let fps_max = if (0.0..=f64::INFINITY).contains(&fps_max) {
+            fps_max
+        } else {
+            f64::INFINITY
+        };
         let global_timer = Timer::start();
         let frame_timer = Timer::start();
-        let show_stats = false;
 
         Self {
             genesis,
             biosquare,
             fps_max,
+            show_stats,
+            filter,
+            output,
             global_timer,
             frame_timer,
-            show_stats,
-            output,
         }
     }
 
-    pub fn set_fps_max(&mut self, fps_max: f64) -> Result<&mut Self> {
-        ensure!(
-            (0.0..=f64::INFINITY).contains(&fps_max),
-            "value cannot be NaN or negative",
-        );
-        self.fps_max = fps_max;
-        Ok(self)
-    }
-
-    pub fn show_stats(&mut self) -> &mut Self {
-        self.show_stats = true;
-        self
-    }
-
-    pub fn hide_stats(&mut self) -> &mut Self {
-        self.show_stats = false;
-        self
-    }
-
-    pub fn run<F>(&mut self, filter: &F) -> Result<&mut Self>
-    where
-        F: Filter,
-    {
+    pub fn run(&mut self) -> Result<&mut Self> {
         self.enter_alternate_screen()?;
 
         let result = 'outer: loop {
-            if let Err(error) = self.render(filter) {
+            if let Err(error) = self.render() {
                 break Err(error);
             }
             self.frame_timer.reset();
@@ -101,10 +92,7 @@ where
         Ok(self)
     }
 
-    fn render<F>(&mut self, filter: &F) -> Result<&mut Self>
-    where
-        F: Filter,
-    {
+    fn render(&mut self) -> Result<&mut Self> {
         self.output
             .queue(terminal::BeginSynchronizedUpdate)?
             .queue(cursor::MoveTo(0, 0))?;
@@ -113,7 +101,7 @@ where
 
         for row in matrix.iter_rows() {
             for cell in row {
-                let view = filter.filter(*cell);
+                let view = self.filter.filter(*cell);
                 self.output.queue(style::Print(view))?;
             }
             self.output.queue(cursor::MoveToNextLine(1))?;

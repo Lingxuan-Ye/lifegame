@@ -1,5 +1,4 @@
-use self::cli::Args;
-use self::cli::Filter;
+use self::cli::{Args, Filter};
 use self::error::QuitOnError;
 use self::filter::{Bit, Block, Dye, Emoji, Hanzi};
 use self::genesis::Random;
@@ -24,7 +23,6 @@ fn run() -> Result<()> {
     setup_listener();
 
     let args = Args::parse();
-
     let shape = Shape::new(args.nrows, args.ncols);
     let genesis = Random::new()
         .density(args.density)?
@@ -32,33 +30,26 @@ fn run() -> Result<()> {
         .generate::<ChaCha8Rng>(shape)?;
     let output = stdout().lock();
 
-    let mut tui = Tui::new(genesis, output);
-
-    tui.set_fps_max(args.fps_max)?;
-
-    if args.show_stats {
-        tui.show_stats();
-    } else {
-        tui.hide_stats();
-    }
-
     match args.filter {
         Filter::Bit => {
-            tui.run(&Bit)?;
+            let filter = Bit;
+            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
         Filter::Block => {
-            tui.run(&Block)?;
+            let filter = Block;
+            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
         Filter::Dye => {
             let filter = Dye::new(args.color_dead, args.color_alive);
-            tui.run(&filter)?;
+            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
         Filter::Emoji => {
             let filter = Emoji::random();
-            tui.run(&filter)?;
+            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
         Filter::Hanzi => {
-            tui.run(&Hanzi)?;
+            let filter = Hanzi;
+            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
     }
 
