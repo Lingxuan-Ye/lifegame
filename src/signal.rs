@@ -106,7 +106,7 @@ impl Pause {
         Self { state, cvar }
     }
 
-    fn state(&self) -> MutexGuard<bool> {
+    fn state(&self) -> MutexGuard<'_, bool> {
         match self.state.lock() {
             Err(_) => unreachable!(),
             Ok(guard) => guard,
