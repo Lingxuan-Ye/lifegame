@@ -92,10 +92,10 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
 });
 
 #[derive(Clone, Debug)]
-pub struct Args<'a> {
+pub struct Args {
     pub nrows: usize,
     pub ncols: usize,
-    pub seed: Option<&'a str>,
+    pub seed: Option<&'static str>,
     pub density: f64,
     pub filter: Filter,
     pub color_dead: CrosstermColor,
@@ -104,7 +104,7 @@ pub struct Args<'a> {
     pub show_stats: bool,
 }
 
-impl Args<'static> {
+impl Args {
     pub fn parse() -> Self {
         const REASON: &str = "default ensures there is always a value";
 
