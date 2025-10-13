@@ -14,12 +14,8 @@ pub struct Emoji {
 impl Emoji {
     pub fn random() -> Self {
         let mut rng = rand::rng();
-        let Some(dead) = DEAD_SYMBOLS.chars().choose(&mut rng) else {
-            unreachable!()
-        };
-        let Some(alive) = ALIVE_SYMBOLS.chars().choose(&mut rng) else {
-            unreachable!()
-        };
+        let dead = DEAD_SYMBOLS.chars().choose(&mut rng).unwrap();
+        let alive = ALIVE_SYMBOLS.chars().choose(&mut rng).unwrap();
         Self { dead, alive }
     }
 }

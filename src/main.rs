@@ -10,6 +10,7 @@ use rand_chacha::ChaCha8Rng;
 use std::io::stdout;
 
 mod biosquare;
+mod bounded;
 mod cli;
 mod error;
 mod filter;
@@ -24,7 +25,7 @@ fn run() -> Result<()> {
     let args = Args::parse();
     let shape = Shape::new(args.nrows, args.ncols);
     let genesis = Random::new()
-        .density(args.density)?
+        .density(args.density)
         .seed(args.seed)
         .generate::<ChaCha8Rng>(shape)?;
     let output = stdout().lock();

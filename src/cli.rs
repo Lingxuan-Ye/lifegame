@@ -1,3 +1,6 @@
+use crate::bounded::Bounded;
+use crate::genesis::Density;
+use crate::tui::FpsMax;
 use clap::{Arg, ArgAction, ArgMatches, ValueEnum, command, value_parser};
 use crossterm::style::Color as CrosstermColor;
 use std::ops::Deref;
@@ -96,42 +99,36 @@ pub struct Args {
     pub nrows: usize,
     pub ncols: usize,
     pub seed: Option<&'static str>,
-    pub density: f64,
+    pub density: Density,
     pub filter: Filter,
     pub color_dead: CrosstermColor,
     pub color_alive: CrosstermColor,
-    pub fps_max: f64,
+    pub fps_max: FpsMax,
     pub show_stats: bool,
 }
 
 impl Args {
     pub fn parse() -> Self {
-        const REASON: &str = "default ensures there is always a value";
-
-        let nrows = MATCHES.get_one::<usize>("nrows").copied().expect(REASON);
-        let ncols = MATCHES.get_one::<usize>("ncols").copied().expect(REASON);
+        let nrows = MATCHES.get_one::<usize>("nrows").copied().unwrap();
+        let ncols = MATCHES.get_one::<usize>("ncols").copied().unwrap();
         let seed = MATCHES.get_one::<String>("seed").map(Deref::deref);
-        let mut density = MATCHES.get_one::<f64>("density").copied().expect(REASON);
-        let filter = MATCHES.get_one::<Filter>("filter").copied().expect(REASON);
+        let density = MATCHES.get_one::<f64>("density").copied().unwrap();
+        let filter = MATCHES.get_one::<Filter>("filter").copied().unwrap();
         let color_dead = MATCHES
             .get_one::<Color>("color-dead")
             .copied()
-            .expect(REASON)
+            .unwrap()
             .into();
         let color_alive = MATCHES
             .get_one::<Color>("color-alive")
             .copied()
-            .expect(REASON)
+            .unwrap()
             .into();
-        let mut fps_max = MATCHES.get_one::<f64>("fps-max").copied().expect(REASON);
+        let fps_max = MATCHES.get_one::<f64>("fps-max").copied().unwrap();
         let show_stats = MATCHES.get_flag("show-stats");
 
-        if !(0.0..=1.0).contains(&density) {
-            density = 0.5;
-        }
-        if !(0.0..=f64::INFINITY).contains(&fps_max) {
-            fps_max = 60.0;
-        }
+        let density = Density::new_or_default(density);
+        let fps_max = FpsMax::new_or_default(fps_max);
 
         Self {
             nrows,
