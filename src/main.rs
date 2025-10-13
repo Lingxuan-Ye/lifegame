@@ -1,5 +1,4 @@
-use self::cli::{Args, FilterKind};
-use self::filter::{Bit, Block, Dye, Emoji, Hanzi};
+use self::cli::Args;
 use self::genesis::Random;
 use self::signal::setup_listener;
 use self::tui::Tui;
@@ -28,29 +27,7 @@ fn run() -> Result<()> {
         .seed(args.seed)
         .generate::<ChaCha8Rng>(shape)?;
     let output = stdout().lock();
-
-    match args.filter {
-        FilterKind::Bit => {
-            let filter = Bit;
-            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
-        }
-        FilterKind::Block => {
-            let filter = Block;
-            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
-        }
-        FilterKind::Dye => {
-            let filter = Dye::new(args.color_dead, args.color_alive);
-            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
-        }
-        FilterKind::Emoji => {
-            let filter = Emoji::random();
-            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
-        }
-        FilterKind::Hanzi => {
-            let filter = Hanzi;
-            Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
-        }
-    }
+    Tui::new(genesis, args.fps_max, args.show_stats, args.filter, output).run()?;
 
     Ok(())
 }

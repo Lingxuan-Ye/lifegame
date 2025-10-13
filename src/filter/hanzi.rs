@@ -1,17 +1,19 @@
 use super::Filter;
 use crate::biosquare::Cell;
-use crossterm::style::{StyledContent, Stylize};
+use crossterm::style::Stylize;
+use std::sync::LazyLock;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+static DEAD: LazyLock<String> = LazyLock::new(|| '死'.bold().dim().to_string());
+static ALIVE: LazyLock<String> = LazyLock::new(|| '生'.bold().to_string());
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Hanzi;
 
 impl Filter for Hanzi {
-    type View = StyledContent<char>;
-
-    fn filter(&self, cell: Cell) -> Self::View {
+    fn filter(&self, cell: Cell) -> &str {
         match cell {
-            Cell::Dead => '死'.bold().dim(),
-            Cell::Alive => '生'.bold(),
+            Cell::Dead => &DEAD,
+            Cell::Alive => &ALIVE,
         }
     }
 }

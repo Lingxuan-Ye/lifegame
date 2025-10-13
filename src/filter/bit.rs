@@ -1,17 +1,19 @@
 use super::Filter;
 use crate::biosquare::Cell;
-use crossterm::style::{StyledContent, Stylize};
+use crossterm::style::Stylize;
+use std::sync::LazyLock;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+static DEAD: LazyLock<String> = LazyLock::new(|| "0 ".green().bold().dim().to_string());
+static ALIVE: LazyLock<String> = LazyLock::new(|| "1 ".green().bold().to_string());
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bit;
 
 impl Filter for Bit {
-    type View = StyledContent<&'static str>;
-
-    fn filter(&self, cell: Cell) -> Self::View {
+    fn filter(&self, cell: Cell) -> &str {
         match cell {
-            Cell::Dead => "0 ".green().bold().dim(),
-            Cell::Alive => "1 ".green().bold(),
+            Cell::Dead => &DEAD,
+            Cell::Alive => &ALIVE,
         }
     }
 }

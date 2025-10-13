@@ -1,9 +1,9 @@
 use crate::bounded::Bounded;
+use crate::filter::{Bit, Block, Dye, Emoji, Filter, Hanzi};
 use crate::genesis::Density;
 use crate::tui::FpsMax;
 use clap::{Arg, ArgAction, ArgMatches, ValueEnum, command, value_parser};
 use crossterm::style::Color;
-use std::ops::Deref;
 use std::sync::LazyLock;
 
 static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
@@ -89,15 +89,12 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
         .get_matches()
 });
 
-#[derive(Clone, Debug)]
 pub struct Args {
     pub nrows: usize,
     pub ncols: usize,
     pub seed: Option<&'static str>,
     pub density: Density,
-    pub filter: FilterKind,
-    pub color_dead: Color,
-    pub color_alive: Color,
+    pub filter: Box<dyn Filter>,
     pub fps_max: FpsMax,
     pub show_stats: bool,
 }
@@ -106,23 +103,45 @@ impl Args {
     pub fn parse() -> Self {
         let nrows = MATCHES.get_one::<usize>("nrows").copied().unwrap();
         let ncols = MATCHES.get_one::<usize>("ncols").copied().unwrap();
-        let seed = MATCHES.get_one::<String>("seed").map(Deref::deref);
+        let seed = MATCHES.get_one::<String>("seed").map(String::as_ref);
         let density = MATCHES.get_one::<f64>("density").copied().unwrap();
         let filter = MATCHES.get_one::<FilterKind>("filter").copied().unwrap();
-        let color_dead = MATCHES
-            .get_one::<ColorKind>("color-dead")
-            .copied()
-            .unwrap()
-            .into();
-        let color_alive = MATCHES
-            .get_one::<ColorKind>("color-alive")
-            .copied()
-            .unwrap()
-            .into();
         let fps_max = MATCHES.get_one::<f64>("fps-max").copied().unwrap();
         let show_stats = MATCHES.get_flag("show-stats");
 
         let density = Density::new_or_default(density);
+        let filter: Box<dyn Filter> = match filter {
+            FilterKind::Bit => {
+                let filter = Bit;
+                Box::new(filter)
+            }
+            FilterKind::Block => {
+                let filter = Block;
+                Box::new(filter)
+            }
+            FilterKind::Dye => {
+                let color_dead = MATCHES
+                    .get_one::<ColorKind>("color-dead")
+                    .copied()
+                    .unwrap()
+                    .into();
+                let color_alive = MATCHES
+                    .get_one::<ColorKind>("color-alive")
+                    .copied()
+                    .unwrap()
+                    .into();
+                let filter = Dye::new(color_dead, color_alive);
+                Box::new(filter)
+            }
+            FilterKind::Emoji => {
+                let filter = Emoji::random();
+                Box::new(filter)
+            }
+            FilterKind::Hanzi => {
+                let filter = Hanzi;
+                Box::new(filter)
+            }
+        };
         let fps_max = FpsMax::new_or_default(fps_max);
 
         Self {
@@ -131,8 +150,6 @@ impl Args {
             seed,
             density,
             filter,
-            color_dead,
-            color_alive,
             fps_max,
             show_stats,
         }
@@ -161,8 +178,8 @@ pub enum ColorKind {
 }
 
 impl From<ColorKind> for Color {
-    fn from(color: ColorKind) -> Self {
-        match color {
+    fn from(value: ColorKind) -> Self {
+        match value {
             ColorKind::Black => Color::Black,
             ColorKind::Red => Color::Red,
             ColorKind::Green => Color::Green,
