@@ -1,5 +1,5 @@
 use super::Filter;
-use crate::cell::Cell;
+use crate::biosquare::Cell;
 use crossterm::style::{Color, StyledContent, Stylize};
 
 const PLACEHOLDER: &str = "  ";

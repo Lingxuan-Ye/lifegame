@@ -1,5 +1,5 @@
 use super::Filter;
-use crate::cell::Cell;
+use crate::biosquare::Cell;
 use rand::seq::IteratorRandom;
 
 const DEAD_SYMBOLS: &str = "🤢🥶🥵😡🤬😈👿🤡👻";

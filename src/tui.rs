@@ -1,5 +1,4 @@
-use crate::biosquare::BioSquare;
-use crate::cell::Cell;
+use crate::biosquare::{BioSquare, Cell};
 use crate::filter::Filter;
 use crate::signal;
 use crate::timer::{Timer, fmt_duration};

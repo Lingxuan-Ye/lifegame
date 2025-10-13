@@ -4,7 +4,7 @@ pub use dye::Dye;
 pub use emoji::Emoji;
 pub use hanzi::Hanzi;
 
-use crate::cell::Cell;
+use crate::biosquare::Cell;
 use std::fmt::Display;
 
 mod bit;

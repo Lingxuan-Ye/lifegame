@@ -1,4 +1,4 @@
-use crate::cell::Cell;
+use crate::biosquare::Cell;
 use anyhow::{Result, ensure};
 use matreex::{Matrix, Shape};
 use rand::{Rng, SeedableRng};

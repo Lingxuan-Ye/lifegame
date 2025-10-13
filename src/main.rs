@@ -10,7 +10,6 @@ use rand_chacha::ChaCha8Rng;
 use std::io::stdout;
 
 mod biosquare;
-mod cell;
 mod cli;
 mod error;
 mod filter;

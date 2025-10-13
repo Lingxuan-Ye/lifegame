@@ -1,5 +1,5 @@
 use super::Filter;
-use crate::cell::Cell;
+use crate::biosquare::Cell;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Block;
