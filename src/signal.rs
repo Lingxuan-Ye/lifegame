@@ -1,5 +1,5 @@
-use crate::error::QuitOnError;
 use crossterm::event::{Event, KeyCode, KeyModifiers, read};
+use eoe::QuitOnError;
 use std::sync::atomic::{AtomicBool, AtomicI8, Ordering};
 use std::sync::{Condvar, Mutex, MutexGuard, Once};
 use std::thread;
@@ -106,7 +106,7 @@ impl Pause {
         Self { state, cvar }
     }
 
-    fn state(&self) -> MutexGuard<bool> {
+    fn state(&self) -> MutexGuard<'_, bool> {
         match self.state.lock() {
             Err(_) => unreachable!(),
             Ok(guard) => guard,

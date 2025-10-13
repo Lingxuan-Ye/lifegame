@@ -1,13 +1,11 @@
 use super::Filter;
-use crate::cell::Cell;
+use crate::biosquare::Cell;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Block;
 
 impl Filter for Block {
-    type View = &'static str;
-
-    fn filter(&self, cell: Cell) -> Self::View {
+    fn filter(&self, cell: Cell) -> &str {
         match cell {
             Cell::Dead => "  ",
             Cell::Alive => "██",

@@ -1,30 +1,28 @@
 use super::Filter;
-use crate::cell::Cell;
-use crossterm::style::{Color, StyledContent, Stylize};
+use crate::biosquare::Cell;
+use crossterm::style::{Color, Stylize};
 
 const PLACEHOLDER: &str = "  ";
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Dye {
-    dead: StyledContent<&'static str>,
-    alive: StyledContent<&'static str>,
+    dead: String,
+    alive: String,
 }
 
 impl Dye {
     pub fn new(dead: Color, alive: Color) -> Self {
-        let dead = PLACEHOLDER.on(dead);
-        let alive = PLACEHOLDER.on(alive);
+        let dead = PLACEHOLDER.on(dead).to_string();
+        let alive = PLACEHOLDER.on(alive).to_string();
         Self { dead, alive }
     }
 }
 
 impl Filter for Dye {
-    type View = StyledContent<&'static str>;
-
-    fn filter(&self, cell: Cell) -> Self::View {
+    fn filter(&self, cell: Cell) -> &str {
         match cell {
-            Cell::Dead => self.dead,
-            Cell::Alive => self.alive,
+            Cell::Dead => &self.dead,
+            Cell::Alive => &self.alive,
         }
     }
 }

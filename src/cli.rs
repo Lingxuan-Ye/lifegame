@@ -1,6 +1,9 @@
+use crate::bounded::Bounded;
+use crate::filter::{Bit, Block, Dye, Emoji, Filter, Hanzi};
+use crate::genesis::Density;
+use crate::tui::FpsMax;
 use clap::{Arg, ArgAction, ArgMatches, ValueEnum, command, value_parser};
-use crossterm::style::Color as CrosstermColor;
-use std::ops::Deref;
+use crossterm::style::Color;
 use std::sync::LazyLock;
 
 static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
@@ -20,17 +23,6 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_parser(value_parser!(usize))
                 .default_value("40")
                 .help("Number of columns"),
-            // Arg::new("genesis")
-            //     .long("genesis")
-            //     .value_name("GENESIS")
-            //     .value_parser(value_parser!(Genesis))
-            //     .default_value("random")
-            //     .hide_default_value(true)
-            //     .hide_possible_values(true)
-            //     .help(Genesis::help(
-            //         "Method for world initialization",
-            //         Some(Genesis::Random),
-            //     )),
             Arg::new("seed")
                 .long("seed")
                 .value_name("STRING")
@@ -41,48 +33,54 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("DECIMAL")
                 .value_parser(value_parser!(f64))
                 .default_value("0.5")
-                .help("Initial population density (use default if out of range 0.0..=1.0)"),
+                .help(format!(
+                    "Initial population density (use default if out of range {:?})",
+                    Density::RANGE
+                )),
             Arg::new("filter")
                 .long("filter")
                 .value_name("FILTER")
-                .value_parser(value_parser!(Filter))
+                .value_parser(value_parser!(FilterKind))
                 .default_value("dye")
                 .hide_default_value(true)
                 .hide_possible_values(true)
-                .help(Filter::help(
+                .help(FilterKind::help(
                     "Filter to observe the world",
-                    Some(Filter::Dye),
+                    Some(FilterKind::Dye),
                 )),
             Arg::new("color-dead")
                 .short('D')
                 .long("color-dead")
                 .value_name("COLOR")
-                .value_parser(value_parser!(Color))
+                .value_parser(value_parser!(ColorKind))
                 .default_value("green")
                 .hide_default_value(true)
                 .hide_possible_values(true)
-                .help(Color::help(
+                .help(ColorKind::help(
                     "Color for dead cells (omit if filter is not dye)",
-                    Some(Color::Green),
+                    Some(ColorKind::Green),
                 )),
             Arg::new("color-alive")
                 .short('A')
                 .long("color-alive")
                 .value_name("COLOR")
-                .value_parser(value_parser!(Color))
+                .value_parser(value_parser!(ColorKind))
                 .default_value("white")
                 .hide_default_value(true)
                 .hide_possible_values(true)
-                .help(Color::help(
+                .help(ColorKind::help(
                     "Color for alive cells (omit if filter is not dye)",
-                    Some(Color::White),
+                    Some(ColorKind::White),
                 )),
             Arg::new("fps-max")
                 .long("fps-max")
                 .value_name("DECIMAL")
                 .value_parser(value_parser!(f64))
                 .default_value("60.0")
-                .help("Maximum fps (use default if out of range 0.0..=f64::INFINITY)"),
+                .help(format!(
+                    "Maximum fps (use default if out of range {:?})",
+                    FpsMax::RANGE
+                )),
             Arg::new("show-stats")
                 .long("show-stats")
                 .action(ArgAction::SetTrue)
@@ -91,47 +89,60 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
         .get_matches()
 });
 
-#[derive(Clone, Debug)]
-pub struct Args<'a> {
+pub struct Args {
     pub nrows: usize,
     pub ncols: usize,
-    pub seed: Option<&'a str>,
-    pub density: f64,
-    pub filter: Filter,
-    pub color_dead: CrosstermColor,
-    pub color_alive: CrosstermColor,
-    pub fps_max: f64,
+    pub seed: Option<&'static str>,
+    pub density: Density,
+    pub filter: Box<dyn Filter>,
+    pub fps_max: FpsMax,
     pub show_stats: bool,
 }
 
-impl Args<'static> {
+impl Args {
     pub fn parse() -> Self {
-        const REASON: &str = "default ensures there is always a value";
-
-        let nrows = MATCHES.get_one::<usize>("nrows").copied().expect(REASON);
-        let ncols = MATCHES.get_one::<usize>("ncols").copied().expect(REASON);
-        let seed = MATCHES.get_one::<String>("seed").map(Deref::deref);
-        let mut density = MATCHES.get_one::<f64>("density").copied().expect(REASON);
-        let filter = MATCHES.get_one::<Filter>("filter").copied().expect(REASON);
-        let color_dead = MATCHES
-            .get_one::<Color>("color-dead")
-            .copied()
-            .expect(REASON)
-            .into();
-        let color_alive = MATCHES
-            .get_one::<Color>("color-alive")
-            .copied()
-            .expect(REASON)
-            .into();
-        let mut fps_max = MATCHES.get_one::<f64>("fps-max").copied().expect(REASON);
+        let nrows = MATCHES.get_one::<usize>("nrows").copied().unwrap();
+        let ncols = MATCHES.get_one::<usize>("ncols").copied().unwrap();
+        let seed = MATCHES.get_one::<String>("seed").map(String::as_ref);
+        let density = MATCHES.get_one::<f64>("density").copied().unwrap();
+        let filter = MATCHES.get_one::<FilterKind>("filter").copied().unwrap();
+        let fps_max = MATCHES.get_one::<f64>("fps-max").copied().unwrap();
         let show_stats = MATCHES.get_flag("show-stats");
 
-        if !(0.0..=1.0).contains(&density) {
-            density = 0.5;
-        }
-        if !(0.0..=f64::INFINITY).contains(&fps_max) {
-            fps_max = 60.0;
-        }
+        let density = Density::new_or_default(density);
+        let filter: Box<dyn Filter> = match filter {
+            FilterKind::Bit => {
+                let filter = Bit;
+                Box::new(filter)
+            }
+            FilterKind::Block => {
+                let filter = Block;
+                Box::new(filter)
+            }
+            FilterKind::Dye => {
+                let color_dead = MATCHES
+                    .get_one::<ColorKind>("color-dead")
+                    .copied()
+                    .unwrap()
+                    .into();
+                let color_alive = MATCHES
+                    .get_one::<ColorKind>("color-alive")
+                    .copied()
+                    .unwrap()
+                    .into();
+                let filter = Dye::new(color_dead, color_alive);
+                Box::new(filter)
+            }
+            FilterKind::Emoji => {
+                let filter = Emoji::random();
+                Box::new(filter)
+            }
+            FilterKind::Hanzi => {
+                let filter = Hanzi;
+                Box::new(filter)
+            }
+        };
+        let fps_max = FpsMax::new_or_default(fps_max);
 
         Self {
             nrows,
@@ -139,8 +150,6 @@ impl Args<'static> {
             seed,
             density,
             filter,
-            color_dead,
-            color_alive,
             fps_max,
             show_stats,
         }
@@ -148,12 +157,7 @@ impl Args<'static> {
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
-pub enum Genesis {
-    Random,
-}
-
-#[derive(Clone, Copy, Debug, ValueEnum)]
-pub enum Filter {
+pub enum FilterKind {
     Bit,
     Block,
     Dye,
@@ -162,7 +166,7 @@ pub enum Filter {
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
-pub enum Color {
+pub enum ColorKind {
     Black,
     Red,
     Green,
@@ -173,17 +177,17 @@ pub enum Color {
     White,
 }
 
-impl From<Color> for CrosstermColor {
-    fn from(color: Color) -> Self {
-        match color {
-            Color::Black => CrosstermColor::Black,
-            Color::Red => CrosstermColor::Red,
-            Color::Green => CrosstermColor::Green,
-            Color::Yellow => CrosstermColor::Yellow,
-            Color::Blue => CrosstermColor::Blue,
-            Color::Magenta => CrosstermColor::Magenta,
-            Color::Cyan => CrosstermColor::Cyan,
-            Color::White => CrosstermColor::White,
+impl From<ColorKind> for Color {
+    fn from(value: ColorKind) -> Self {
+        match value {
+            ColorKind::Black => Color::Black,
+            ColorKind::Red => Color::Red,
+            ColorKind::Green => Color::Green,
+            ColorKind::Yellow => Color::Yellow,
+            ColorKind::Blue => Color::Blue,
+            ColorKind::Magenta => Color::Magenta,
+            ColorKind::Cyan => Color::Cyan,
+            ColorKind::White => Color::White,
         }
     }
 }

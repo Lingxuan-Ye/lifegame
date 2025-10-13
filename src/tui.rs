@@ -1,5 +1,5 @@
-use crate::biosquare::BioSquare;
-use crate::cell::Cell;
+use crate::biosquare::{BioSquare, Cell};
+use crate::bounded::Bounded;
 use crate::filter::Filter;
 use crate::signal;
 use crate::timer::{Timer, fmt_duration};
@@ -8,6 +8,7 @@ use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
+use std::ops::RangeInclusive;
 
 #[derive(Clone, Debug)]
 pub struct Tui<F, O>
@@ -17,7 +18,7 @@ where
 {
     genesis: Matrix<Cell>,
     biosquare: BioSquare,
-    fps_max: f64,
+    fps_max: FpsMax,
     show_stats: bool,
     filter: F,
     output: O,
@@ -32,17 +33,12 @@ where
 {
     pub fn new(
         genesis: Matrix<Cell>,
-        fps_max: f64,
+        fps_max: FpsMax,
         show_stats: bool,
         filter: F,
         output: O,
     ) -> Self {
         let biosquare = BioSquare::new(genesis.clone());
-        let fps_max = if (0.0..=f64::INFINITY).contains(&fps_max) {
-            fps_max
-        } else {
-            f64::INFINITY
-        };
         let global_timer = Timer::start();
         let frame_timer = Timer::start();
 
@@ -176,7 +172,7 @@ where
     }
 
     fn frame_duration_min(&self) -> f64 {
-        signal::TIME_SCALE.scale() / self.fps_max
+        signal::TIME_SCALE.scale() / self.fps_max.get()
     }
 
     fn enter_alternate_screen(&mut self) -> Result<&mut Self> {
@@ -203,5 +199,30 @@ where
             .flush()?;
 
         Ok(self)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct FpsMax(f64);
+
+impl Bounded<f64, RangeInclusive<f64>> for FpsMax {
+    const RANGE: RangeInclusive<f64> = 0.0..=f64::INFINITY;
+
+    fn new_or_default(value: f64) -> Self {
+        if Self::RANGE.contains(&value) {
+            Self(value)
+        } else {
+            Self::default()
+        }
+    }
+
+    fn get(&self) -> &f64 {
+        &self.0
+    }
+}
+
+impl Default for FpsMax {
+    fn default() -> Self {
+        Self(60.0)
     }
 }
