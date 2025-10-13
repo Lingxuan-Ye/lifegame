@@ -1,5 +1,5 @@
-use crate::error::QuitOnError;
 use crossterm::event::{Event, KeyCode, KeyModifiers, read};
+use eoe::QuitOnError;
 use std::sync::atomic::{AtomicBool, AtomicI8, Ordering};
 use std::sync::{Condvar, Mutex, MutexGuard, Once};
 use std::thread;
