@@ -1,4 +1,4 @@
-use self::cli::{Args, Filter};
+use self::cli::{Args, FilterKind};
 use self::error::QuitOnError;
 use self::filter::{Bit, Block, Dye, Emoji, Hanzi};
 use self::genesis::Random;
@@ -31,23 +31,23 @@ fn run() -> Result<()> {
     let output = stdout().lock();
 
     match args.filter {
-        Filter::Bit => {
+        FilterKind::Bit => {
             let filter = Bit;
             Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
-        Filter::Block => {
+        FilterKind::Block => {
             let filter = Block;
             Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
-        Filter::Dye => {
+        FilterKind::Dye => {
             let filter = Dye::new(args.color_dead, args.color_alive);
             Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
-        Filter::Emoji => {
+        FilterKind::Emoji => {
             let filter = Emoji::random();
             Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
-        Filter::Hanzi => {
+        FilterKind::Hanzi => {
             let filter = Hanzi;
             Tui::new(genesis, args.fps_max, args.show_stats, filter, output).run()?;
         }
