@@ -101,12 +101,12 @@ pub struct Args {
 
 impl Args {
     pub fn parse() -> Self {
-        let nrows = MATCHES.get_one::<usize>("nrows").copied().unwrap();
-        let ncols = MATCHES.get_one::<usize>("ncols").copied().unwrap();
-        let seed = MATCHES.get_one::<String>("seed").map(String::as_ref);
-        let density = MATCHES.get_one::<f64>("density").copied().unwrap();
-        let filter = MATCHES.get_one::<FilterKind>("filter").copied().unwrap();
-        let fps_max = MATCHES.get_one::<f64>("fps-max").copied().unwrap();
+        let nrows = MATCHES.get_one("nrows").copied().unwrap();
+        let ncols = MATCHES.get_one("ncols").copied().unwrap();
+        let seed = MATCHES.get_one("seed").map(String::as_ref);
+        let density = MATCHES.get_one("density").copied().unwrap();
+        let filter = MATCHES.get_one("filter").copied().unwrap();
+        let fps_max = MATCHES.get_one("fps-max").copied().unwrap();
         let show_stats = MATCHES.get_flag("show-stats");
 
         let density = Density::new_or_default(density);

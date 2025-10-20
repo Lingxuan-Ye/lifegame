@@ -4,7 +4,7 @@ use crossterm::style::{Color, Stylize};
 
 const PLACEHOLDER: &str = "  ";
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Dye {
     dead: String,
     alive: String,
