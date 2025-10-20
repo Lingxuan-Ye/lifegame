@@ -5,6 +5,7 @@ use crate::signal;
 use anyhow::Result;
 use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
+use eoe::QuitOnError;
 use matreex::Matrix;
 use std::io::Write;
 use std::ops::RangeInclusive;
@@ -36,11 +37,10 @@ where
         show_stats: bool,
         filter: F,
         output: O,
-    ) -> Self {
+    ) -> Result<Self> {
         let biosquare = BioSquare::new(genesis.clone());
         let timer = Timer::start();
-
-        Self {
+        let mut tui = Self {
             genesis,
             biosquare,
             fps_max,
@@ -48,13 +48,15 @@ where
             filter,
             output,
             timer,
-        }
+        };
+
+        tui.enter_alternate_screen()?;
+
+        Ok(tui)
     }
 
-    pub fn run(&mut self) -> Result<&mut Self> {
-        self.enter_alternate_screen()?;
-
-        let result = 'outer: loop {
+    pub fn run(&mut self) -> Result<()> {
+        'outer: loop {
             self.timer.tick();
 
             if signal::RESET.take() {
@@ -78,16 +80,10 @@ where
                     break 'outer Ok(());
                 }
             }
-        };
-
-        self.leave_alternate_screen()?;
-
-        result?;
-
-        Ok(self)
+        }
     }
 
-    fn render(&mut self) -> Result<&mut Self> {
+    fn render(&mut self) -> Result<()> {
         self.output
             .queue(terminal::BeginSynchronizedUpdate)?
             .queue(cursor::MoveTo(0, 0))?;
@@ -110,10 +106,10 @@ where
             .queue(terminal::EndSynchronizedUpdate)?
             .flush()?;
 
-        Ok(self)
+        Ok(())
     }
 
-    fn render_stats(&mut self) -> Result<&mut Self> {
+    fn render_stats(&mut self) -> Result<()> {
         self.output.queue(cursor::MoveToNextLine(2))?;
 
         let generation = self.biosquare.generation();
@@ -128,7 +124,7 @@ where
             .render_measurement("FPS", format!("{fps:.2}"))?
             .render_measurement("Runtime", fmt_duration(runtime))?;
 
-        Ok(self)
+        Ok(())
     }
 
     /// # Notes
@@ -154,47 +150,52 @@ where
         Ok(self)
     }
 
-    fn reset(&mut self) -> &mut Self {
+    fn reset(&mut self) {
         self.biosquare = BioSquare::new(self.genesis.clone());
         self.timer = Timer::start();
-        self
     }
 
-    fn wait_if_paused(&mut self) -> &mut Self {
-        let timer = self.timer.pause();
+    fn wait_if_paused(&mut self) {
+        let _paused = self.timer.pause();
         signal::PAUSE.wait_if_paused();
-        drop(timer);
-        self
     }
 
     fn frame_duration_min(&self) -> f64 {
         signal::TIME_SCALE.scale() / self.fps_max.get()
     }
 
-    fn enter_alternate_screen(&mut self) -> Result<&mut Self> {
+    fn enter_alternate_screen(&mut self) -> Result<()> {
         self.output
-            .queue(terminal::SetTitle("Lifegame"))?
-            .queue(cursor::Hide)?
             .queue(terminal::EnterAlternateScreen)?
             .queue(terminal::DisableLineWrap)?
-            .queue(terminal::Clear(terminal::ClearType::All))?
+            .queue(cursor::Hide)?
             .flush()?;
 
         terminal::enable_raw_mode()?;
 
-        Ok(self)
+        Ok(())
     }
 
-    fn leave_alternate_screen(&mut self) -> Result<&mut Self> {
+    fn leave_alternate_screen(&mut self) -> Result<()> {
         terminal::disable_raw_mode()?;
 
         self.output
+            .queue(cursor::Show)?
             .queue(terminal::EnableLineWrap)?
             .queue(terminal::LeaveAlternateScreen)?
-            .queue(cursor::Show)?
             .flush()?;
 
-        Ok(self)
+        Ok(())
+    }
+}
+
+impl<F, O> Drop for Tui<F, O>
+where
+    F: Filter,
+    O: Write,
+{
+    fn drop(&mut self) {
+        self.leave_alternate_screen().quit_on_error();
     }
 }
 
@@ -251,10 +252,9 @@ impl Timer {
         self.last_frame
     }
 
-    fn tick(&mut self) -> &mut Self {
+    fn tick(&mut self) {
         self.last_frame = self.frame();
         self.frame_start = Instant::now();
-        self
     }
 
     fn pause(&mut self) -> PausedTimer<'_> {
