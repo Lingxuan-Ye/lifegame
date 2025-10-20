@@ -73,18 +73,16 @@ impl TimeScale {
         Self { exponent }
     }
 
-    fn increment(&self) -> &Self {
+    fn increment(&self) {
         if self.exponent.load(Ordering::Relaxed) < Self::MAX_EXPONENT {
             self.exponent.fetch_add(1, Ordering::Relaxed);
         }
-        self
     }
 
-    fn decrement(&self) -> &Self {
+    fn decrement(&self) {
         if self.exponent.load(Ordering::Relaxed) > Self::MIN_EXPONENT {
             self.exponent.fetch_sub(1, Ordering::Relaxed);
         }
-        self
     }
 
     pub fn scale(&self) -> f64 {
@@ -113,7 +111,7 @@ impl Pause {
         }
     }
 
-    fn toggle(&self) -> &Self {
+    fn toggle(&self) {
         let mut state = self.state();
         if *state {
             *state = false;
@@ -121,16 +119,14 @@ impl Pause {
         } else {
             *state = true;
         }
-        self
     }
 
-    fn unset(&self) -> &Self {
+    fn unset(&self) {
         *self.state() = false;
         self.cvar.notify_all();
-        self
     }
 
-    pub fn wait_if_paused(&self) -> &Self {
+    pub fn wait_if_paused(&self) {
         let mut state = self.state();
         while *state {
             state = match self.cvar.wait(state) {
@@ -138,7 +134,6 @@ impl Pause {
                 Ok(guard) => guard,
             };
         }
-        self
     }
 }
 
@@ -153,9 +148,8 @@ impl Reset {
         Self { state }
     }
 
-    fn set(&self) -> &Self {
+    fn set(&self) {
         self.state.store(true, Ordering::Relaxed);
-        self
     }
 
     pub fn take(&self) -> bool {
@@ -174,9 +168,8 @@ impl Quit {
         Self { state }
     }
 
-    fn set(&self) -> &Self {
+    fn set(&self) {
         self.state.store(true, Ordering::Relaxed);
-        self
     }
 
     pub fn get(&self) -> bool {

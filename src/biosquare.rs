@@ -11,14 +11,12 @@ impl Cell {
         *self == Self::Alive
     }
 
-    pub fn die(&mut self) -> &mut Self {
+    pub fn die(&mut self) {
         *self = Self::Dead;
-        self
     }
 
-    pub fn revive(&mut self) -> &mut Self {
+    pub fn revive(&mut self) {
         *self = Self::Alive;
-        self
     }
 }
 
@@ -70,7 +68,7 @@ impl BioSquare {
         self.population as f64 / self.observe().size() as f64
     }
 
-    pub fn evolve(&mut self) -> &mut Self {
+    pub fn evolve(&mut self) {
         const OFFSETS: [(isize, isize); 8] = [
             (-1, -1),
             (-1, 0),
@@ -117,7 +115,5 @@ impl BioSquare {
         }
 
         self.current.overwrite(&self.next);
-
-        self
     }
 }

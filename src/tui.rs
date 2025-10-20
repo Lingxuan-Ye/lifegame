@@ -55,7 +55,7 @@ where
         Ok(tui)
     }
 
-    pub fn run(&mut self) -> Result<&mut Self> {
+    pub fn run(&mut self) -> Result<()> {
         'outer: loop {
             self.timer.tick();
 
@@ -66,7 +66,7 @@ where
             self.wait_if_paused();
 
             if signal::QUIT.get() {
-                break Ok(self);
+                break Ok(());
             }
 
             if let Err(error) = self.render() {
@@ -77,13 +77,13 @@ where
 
             while self.timer.frame().as_secs_f64() < self.frame_duration_min() {
                 if signal::QUIT.get() {
-                    break 'outer Ok(self);
+                    break 'outer Ok(());
                 }
             }
         }
     }
 
-    fn render(&mut self) -> Result<&mut Self> {
+    fn render(&mut self) -> Result<()> {
         self.output
             .queue(terminal::BeginSynchronizedUpdate)?
             .queue(cursor::MoveTo(0, 0))?;
@@ -106,10 +106,10 @@ where
             .queue(terminal::EndSynchronizedUpdate)?
             .flush()?;
 
-        Ok(self)
+        Ok(())
     }
 
-    fn render_stats(&mut self) -> Result<&mut Self> {
+    fn render_stats(&mut self) -> Result<()> {
         self.output.queue(cursor::MoveToNextLine(2))?;
 
         let generation = self.biosquare.generation();
@@ -124,7 +124,7 @@ where
             .render_measurement("FPS", format!("{fps:.2}"))?
             .render_measurement("Runtime", fmt_duration(runtime))?;
 
-        Ok(self)
+        Ok(())
     }
 
     /// # Notes
@@ -150,24 +150,21 @@ where
         Ok(self)
     }
 
-    fn reset(&mut self) -> &mut Self {
+    fn reset(&mut self) {
         self.biosquare = BioSquare::new(self.genesis.clone());
         self.timer = Timer::start();
-        self
     }
 
-    fn wait_if_paused(&mut self) -> &mut Self {
-        let timer = self.timer.pause();
+    fn wait_if_paused(&mut self) {
+        let _paused = self.timer.pause();
         signal::PAUSE.wait_if_paused();
-        drop(timer);
-        self
     }
 
     fn frame_duration_min(&self) -> f64 {
         signal::TIME_SCALE.scale() / self.fps_max.get()
     }
 
-    fn enter_alternate_screen(&mut self) -> Result<&mut Self> {
+    fn enter_alternate_screen(&mut self) -> Result<()> {
         self.output
             .queue(terminal::EnterAlternateScreen)?
             .queue(terminal::DisableLineWrap)?
@@ -176,10 +173,10 @@ where
 
         terminal::enable_raw_mode()?;
 
-        Ok(self)
+        Ok(())
     }
 
-    fn leave_alternate_screen(&mut self) -> Result<&mut Self> {
+    fn leave_alternate_screen(&mut self) -> Result<()> {
         terminal::disable_raw_mode()?;
 
         self.output
@@ -188,7 +185,7 @@ where
             .queue(terminal::LeaveAlternateScreen)?
             .flush()?;
 
-        Ok(self)
+        Ok(())
     }
 }
 
@@ -255,10 +252,9 @@ impl Timer {
         self.last_frame
     }
 
-    fn tick(&mut self) -> &mut Self {
+    fn tick(&mut self) {
         self.last_frame = self.frame();
         self.frame_start = Instant::now();
-        self
     }
 
     fn pause(&mut self) -> PausedTimer<'_> {
