@@ -1,7 +1,7 @@
 use super::Filter;
 use crate::biosquare::Cell;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Block;
 
 impl Filter for Block {

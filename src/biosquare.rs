@@ -28,7 +28,7 @@ impl From<bool> for Cell {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct BioSquare {
     generation: usize,
     population: usize,

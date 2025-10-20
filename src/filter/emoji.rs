@@ -5,7 +5,7 @@ use rand::Rng;
 const DEAD_SYMBOLS: &str = "🤢🥶🥵😡🤬😈👿🤡👻";
 const ALIVE_SYMBOLS: &str = "🤣😊🥰😍🤗🤭😋🤤😤";
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Emoji {
     dead: &'static str,
     alive: &'static str,

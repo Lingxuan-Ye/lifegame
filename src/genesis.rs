@@ -7,7 +7,7 @@ use rand_seeder::Seeder;
 use std::hash::Hash;
 use std::ops::RangeInclusive;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Random {
     density: Density,
     seeder: Option<Seeder>,
@@ -51,7 +51,7 @@ impl Random {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Density(f64);
 
 impl Bounded<f64, RangeInclusive<f64>> for Density {

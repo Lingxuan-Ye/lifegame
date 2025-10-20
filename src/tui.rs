@@ -10,7 +10,7 @@ use std::io::Write;
 use std::ops::RangeInclusive;
 use std::time::{Duration, Instant};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Tui<F, O>
 where
     F: Filter,
@@ -198,7 +198,7 @@ where
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct FpsMax(f64);
 
 impl Bounded<f64, RangeInclusive<f64>> for FpsMax {
@@ -223,7 +223,7 @@ impl Default for FpsMax {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 struct Timer {
     global_start: Instant,
     frame_start: Instant,
