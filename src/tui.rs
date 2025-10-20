@@ -5,6 +5,7 @@ use crate::signal;
 use anyhow::Result;
 use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
+use eoe::QuitOnError;
 use matreex::Matrix;
 use std::io::Write;
 use std::ops::RangeInclusive;
@@ -36,11 +37,10 @@ where
         show_stats: bool,
         filter: F,
         output: O,
-    ) -> Self {
+    ) -> Result<Self> {
         let biosquare = BioSquare::new(genesis.clone());
         let timer = Timer::start();
-
-        Self {
+        let mut tui = Self {
             genesis,
             biosquare,
             fps_max,
@@ -48,13 +48,15 @@ where
             filter,
             output,
             timer,
-        }
+        };
+
+        tui.enter_alternate_screen()?;
+
+        Ok(tui)
     }
 
     pub fn run(&mut self) -> Result<&mut Self> {
-        self.enter_alternate_screen()?;
-
-        let result = 'outer: loop {
+        'outer: loop {
             self.timer.tick();
 
             if signal::RESET.take() {
@@ -64,7 +66,7 @@ where
             self.wait_if_paused();
 
             if signal::QUIT.get() {
-                break Ok(());
+                break Ok(self);
             }
 
             if let Err(error) = self.render() {
@@ -75,16 +77,10 @@ where
 
             while self.timer.frame().as_secs_f64() < self.frame_duration_min() {
                 if signal::QUIT.get() {
-                    break 'outer Ok(());
+                    break 'outer Ok(self);
                 }
             }
-        };
-
-        self.leave_alternate_screen()?;
-
-        result?;
-
-        Ok(self)
+        }
     }
 
     fn render(&mut self) -> Result<&mut Self> {
@@ -173,11 +169,9 @@ where
 
     fn enter_alternate_screen(&mut self) -> Result<&mut Self> {
         self.output
-            .queue(terminal::SetTitle("Lifegame"))?
-            .queue(cursor::Hide)?
             .queue(terminal::EnterAlternateScreen)?
             .queue(terminal::DisableLineWrap)?
-            .queue(terminal::Clear(terminal::ClearType::All))?
+            .queue(cursor::Hide)?
             .flush()?;
 
         terminal::enable_raw_mode()?;
@@ -189,12 +183,22 @@ where
         terminal::disable_raw_mode()?;
 
         self.output
+            .queue(cursor::Show)?
             .queue(terminal::EnableLineWrap)?
             .queue(terminal::LeaveAlternateScreen)?
-            .queue(cursor::Show)?
             .flush()?;
 
         Ok(self)
+    }
+}
+
+impl<F, O> Drop for Tui<F, O>
+where
+    F: Filter,
+    O: Write,
+{
+    fn drop(&mut self) {
+        self.leave_alternate_screen().quit_on_error();
     }
 }
 

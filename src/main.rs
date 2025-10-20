@@ -26,7 +26,8 @@ fn run() -> Result<()> {
         .seed(args.seed)
         .generate::<ChaCha8Rng>(shape)?;
     let output = stdout().lock();
-    Tui::new(genesis, args.fps_max, args.show_stats, args.filter, output).run()?;
+
+    Tui::new(genesis, args.fps_max, args.show_stats, args.filter, output)?.run()?;
 
     Ok(())
 }
