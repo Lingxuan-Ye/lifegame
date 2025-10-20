@@ -2,13 +2,13 @@ use crate::biosquare::{BioSquare, Cell};
 use crate::bounded::Bounded;
 use crate::filter::Filter;
 use crate::signal;
-use crate::timer::{Timer, fmt_duration};
 use anyhow::Result;
 use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use matreex::Matrix;
 use std::io::Write;
 use std::ops::RangeInclusive;
+use std::time::{Duration, Instant};
 
 #[derive(Clone, Debug)]
 pub struct Tui<F, O>
@@ -221,4 +221,84 @@ impl Default for FpsMax {
     fn default() -> Self {
         Self(60.0)
     }
+}
+
+#[derive(Clone, Debug)]
+struct Timer {
+    global_start: Instant,
+    frame_start: Instant,
+    last_frame: Duration,
+}
+
+impl Timer {
+    fn start() -> Self {
+        Self {
+            global_start: Instant::now(),
+            frame_start: Instant::now(),
+            last_frame: Duration::default(),
+        }
+    }
+
+    fn global(&self) -> Duration {
+        self.global_start.elapsed()
+    }
+
+    fn frame(&self) -> Duration {
+        self.frame_start.elapsed()
+    }
+
+    fn last_frame(&self) -> Duration {
+        self.last_frame
+    }
+
+    fn tick(&mut self) -> &mut Self {
+        self.last_frame = self.frame();
+        self.frame_start = Instant::now();
+        self
+    }
+
+    fn pause(&mut self) -> PausedTimer<'_> {
+        PausedTimer {
+            start: Instant::now(),
+            timer: self,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct PausedTimer<'a> {
+    start: Instant,
+    timer: &'a mut Timer,
+}
+
+impl PausedTimer<'_> {
+    fn elapsed(&self) -> Duration {
+        self.start.elapsed()
+    }
+}
+
+impl Drop for PausedTimer<'_> {
+    fn drop(&mut self) {
+        let elapsed = self.elapsed();
+        self.timer.frame_start += elapsed;
+    }
+}
+
+fn fmt_duration(duration: Duration) -> String {
+    const NANOS_PER_SEC: u128 = Duration::from_secs(1).as_nanos();
+    const NANOS_PER_MILLI: u128 = Duration::from_millis(1).as_nanos();
+    const NANOS_PER_MICRO: u128 = Duration::from_micros(1).as_nanos();
+
+    let mut nanos = duration.as_nanos();
+
+    let secs = nanos / NANOS_PER_SEC;
+    nanos %= NANOS_PER_SEC;
+
+    let millis = nanos / NANOS_PER_MILLI;
+    nanos %= NANOS_PER_MILLI;
+
+    let micros = nanos / NANOS_PER_MICRO;
+    nanos %= NANOS_PER_MICRO;
+
+    format!("{secs} s {millis:>03} ms {micros:>03} μs {nanos:>03} ns")
 }

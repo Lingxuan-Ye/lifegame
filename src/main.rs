@@ -14,7 +14,6 @@ mod cli;
 mod filter;
 mod genesis;
 mod signal;
-mod timer;
 mod tui;
 
 fn run() -> Result<()> {
