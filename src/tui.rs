@@ -22,8 +22,7 @@ where
     show_stats: bool,
     filter: F,
     output: O,
-    global_timer: Timer,
-    frame_timer: Timer,
+    timer: Timer,
 }
 
 impl<F, O> Tui<F, O>
@@ -39,8 +38,7 @@ where
         output: O,
     ) -> Self {
         let biosquare = BioSquare::new(genesis.clone());
-        let global_timer = Timer::start();
-        let frame_timer = Timer::start();
+        let timer = Timer::start();
 
         Self {
             genesis,
@@ -49,8 +47,7 @@ where
             show_stats,
             filter,
             output,
-            global_timer,
-            frame_timer,
+            timer,
         }
     }
 
@@ -58,17 +55,7 @@ where
         self.enter_alternate_screen()?;
 
         let result = 'outer: loop {
-            if let Err(error) = self.render() {
-                break Err(error);
-            }
-            self.frame_timer.reset();
-            self.biosquare.evolve();
-
-            while self.frame_timer.elapsed().as_secs_f64() < self.frame_duration_min() {
-                if signal::QUIT.get() {
-                    break 'outer Ok(());
-                }
-            }
+            self.timer.tick();
 
             if signal::RESET.take() {
                 self.reset();
@@ -78,6 +65,18 @@ where
 
             if signal::QUIT.get() {
                 break Ok(());
+            }
+
+            if let Err(error) = self.render() {
+                break Err(error);
+            }
+
+            self.biosquare.evolve();
+
+            while self.timer.frame().as_secs_f64() < self.frame_duration_min() {
+                if signal::QUIT.get() {
+                    break 'outer Ok(());
+                }
             }
         };
 
@@ -120,8 +119,8 @@ where
         let generation = self.biosquare.generation();
         let population = self.biosquare.population();
         let density = self.biosquare.density();
-        let fps = 1.0 / self.frame_timer.elapsed().as_secs_f64();
-        let runtime = self.global_timer.elapsed();
+        let fps = 1.0 / self.timer.last_frame().as_secs_f64();
+        let runtime = self.timer.global();
 
         self.render_measurement("Generation", format!("{generation}"))?
             .render_measurement("Population", format!("{population}"))?
@@ -157,17 +156,14 @@ where
 
     fn reset(&mut self) -> &mut Self {
         self.biosquare = BioSquare::new(self.genesis.clone());
-        self.global_timer.reset();
-        self.frame_timer.reset();
+        self.timer = Timer::start();
         self
     }
 
     fn wait_if_paused(&mut self) -> &mut Self {
-        let global_timer = self.global_timer.pause();
-        let frame_timer = self.frame_timer.pause();
+        let timer = self.timer.pause();
         signal::PAUSE.wait_if_paused();
-        drop(global_timer);
-        drop(frame_timer);
+        drop(timer);
         self
     }
 
