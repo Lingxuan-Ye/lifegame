@@ -1,4 +1,5 @@
 use matreex::{Matrix, WrappingIndex};
+use rand::Rng;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
@@ -66,6 +67,28 @@ impl BioSquare {
 
     pub fn density(&self) -> f64 {
         self.population as f64 / self.observe().size() as f64
+    }
+
+    pub fn random_flip<R>(&mut self, rng: &mut R)
+    where
+        R: Rng,
+    {
+        const FLIP_RATE: f64 = 0.1;
+
+        for cell in self.current.iter_elements_mut() {
+            if rng.random_bool(FLIP_RATE) {
+                match cell {
+                    Cell::Dead => {
+                        cell.revive();
+                        self.population += 1;
+                    }
+                    Cell::Alive => {
+                        cell.die();
+                        self.population -= 1;
+                    }
+                }
+            }
+        }
     }
 
     pub fn evolve(&mut self) {

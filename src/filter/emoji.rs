@@ -14,12 +14,12 @@ pub struct Emoji {
 impl Emoji {
     pub fn random() -> Self {
         let mut rng = rand::rng();
-        let dead = Self::random_char_slice(DEAD_SYMBOLS, &mut rng);
-        let alive = Self::random_char_slice(ALIVE_SYMBOLS, &mut rng);
+        let dead = Self::random_char(DEAD_SYMBOLS, &mut rng);
+        let alive = Self::random_char(ALIVE_SYMBOLS, &mut rng);
         Self { dead, alive }
     }
 
-    fn random_char_slice<'a, R>(slice: &'a str, rng: &mut R) -> &'a str
+    fn random_char<'a, R>(slice: &'a str, rng: &mut R) -> &'a str
     where
         R: Rng,
     {
