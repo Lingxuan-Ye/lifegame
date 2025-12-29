@@ -6,6 +6,7 @@ use std::thread;
 
 pub static TIME_SCALE: TimeScale = TimeScale::new();
 pub static PAUSE: Pause = Pause::new();
+pub static FLIP: Flip = Flip::new();
 pub static RESET: Reset = Reset::new();
 pub static QUIT: Quit = Quit::new();
 
@@ -35,6 +36,9 @@ pub fn setup_listener() {
                 }
                 'p' => {
                     PAUSE.toggle();
+                }
+                'f' => {
+                    FLIP.set();
                 }
                 'r' => {
                     RESET.set();
@@ -134,6 +138,26 @@ impl Pause {
                 Ok(guard) => guard,
             };
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct Flip {
+    state: AtomicBool,
+}
+
+impl Flip {
+    const fn new() -> Self {
+        let state = AtomicBool::new(false);
+        Self { state }
+    }
+
+    fn set(&self) {
+        self.state.store(true, Ordering::Relaxed);
+    }
+
+    pub fn take(&self) -> bool {
+        self.state.swap(false, Ordering::Relaxed)
     }
 }
 

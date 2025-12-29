@@ -6,6 +6,7 @@ use crossterm::style::Stylize;
 use crossterm::{QueueableCommand, cursor, style, terminal};
 use eoe::QuitOnError;
 use matreex::Matrix;
+use rand::rngs::ThreadRng;
 use std::io::Write;
 use std::time::{Duration, Instant};
 
@@ -20,6 +21,7 @@ where
     fps_max: f64,
     show_stats: bool,
     timer: Timer,
+    rng: ThreadRng,
     filter: F,
     output: O,
 }
@@ -39,6 +41,7 @@ where
         let biosquare = BioSquare::new(genesis.clone());
         let fps_max = if fps_max >= 0.0 { fps_max } else { 60.0 };
         let timer = Timer::start();
+        let rng = rand::rng();
 
         let mut tui = Self {
             biosquare,
@@ -46,6 +49,7 @@ where
             fps_max,
             show_stats,
             timer,
+            rng,
             filter,
             output,
         };
@@ -63,6 +67,10 @@ where
 
             if signal::QUIT.get() {
                 break Ok(());
+            }
+
+            if signal::FLIP.take() {
+                self.random_flip();
             }
 
             if signal::RESET.take() {
@@ -153,6 +161,10 @@ where
     fn wait_if_paused(&mut self) {
         let _paused = self.timer.pause();
         signal::PAUSE.wait_if_paused();
+    }
+
+    fn random_flip(&mut self) {
+        self.biosquare.random_flip(&mut self.rng);
     }
 
     fn reset(&mut self) {
