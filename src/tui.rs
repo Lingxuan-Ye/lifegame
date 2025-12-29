@@ -1,5 +1,4 @@
 use crate::biosquare::{BioSquare, Cell};
-use crate::bounded::Bounded;
 use crate::filter::Filter;
 use crate::signal;
 use anyhow::Result;
@@ -8,7 +7,6 @@ use crossterm::{QueueableCommand, cursor, style, terminal};
 use eoe::QuitOnError;
 use matreex::Matrix;
 use std::io::Write;
-use std::ops::RangeInclusive;
 use std::time::{Duration, Instant};
 
 #[derive(Debug)]
@@ -17,13 +15,13 @@ where
     F: Filter,
     O: Write,
 {
-    genesis: Matrix<Cell>,
     biosquare: BioSquare,
-    fps_max: FpsMax,
+    genesis: Matrix<Cell>,
+    fps_max: f64,
     show_stats: bool,
+    timer: Timer,
     filter: F,
     output: O,
-    timer: Timer,
 }
 
 impl<F, O> Tui<F, O>
@@ -33,21 +31,23 @@ where
 {
     pub fn new(
         genesis: Matrix<Cell>,
-        fps_max: FpsMax,
+        fps_max: f64,
         show_stats: bool,
         filter: F,
         output: O,
     ) -> Result<Self> {
         let biosquare = BioSquare::new(genesis.clone());
+        let fps_max = if fps_max >= 0.0 { fps_max } else { 60.0 };
         let timer = Timer::start();
+
         let mut tui = Self {
-            genesis,
             biosquare,
+            genesis,
             fps_max,
             show_stats,
+            timer,
             filter,
             output,
-            timer,
         };
 
         tui.enter_alternate_screen()?;
@@ -59,14 +59,14 @@ where
         'outer: loop {
             self.timer.tick();
 
-            if signal::RESET.take() {
-                self.reset();
-            }
-
             self.wait_if_paused();
 
             if signal::QUIT.get() {
                 break Ok(());
+            }
+
+            if signal::RESET.take() {
+                self.reset();
             }
 
             if let Err(error) = self.render() {
@@ -150,18 +150,18 @@ where
         Ok(self)
     }
 
-    fn reset(&mut self) {
-        self.biosquare = BioSquare::new(self.genesis.clone());
-        self.timer = Timer::start();
-    }
-
     fn wait_if_paused(&mut self) {
         let _paused = self.timer.pause();
         signal::PAUSE.wait_if_paused();
     }
 
+    fn reset(&mut self) {
+        self.biosquare = BioSquare::new(self.genesis.clone());
+        self.timer = Timer::start();
+    }
+
     fn frame_duration_min(&self) -> f64 {
-        signal::TIME_SCALE.scale() / self.fps_max.get()
+        signal::TIME_SCALE.scale() / self.fps_max
     }
 
     fn enter_alternate_screen(&mut self) -> Result<()> {
@@ -196,31 +196,6 @@ where
 {
     fn drop(&mut self) {
         self.leave_alternate_screen().quit_on_error();
-    }
-}
-
-#[derive(Debug)]
-pub struct FpsMax(f64);
-
-impl Bounded<f64, RangeInclusive<f64>> for FpsMax {
-    const RANGE: RangeInclusive<f64> = 0.0..=f64::INFINITY;
-
-    fn new_or_default(value: f64) -> Self {
-        if Self::RANGE.contains(&value) {
-            Self(value)
-        } else {
-            Self::default()
-        }
-    }
-
-    fn get(&self) -> &f64 {
-        &self.0
-    }
-}
-
-impl Default for FpsMax {
-    fn default() -> Self {
-        Self(60.0)
     }
 }
 
@@ -271,16 +246,9 @@ struct PausedTimer<'a> {
     timer: &'a mut Timer,
 }
 
-impl PausedTimer<'_> {
-    fn elapsed(&self) -> Duration {
-        self.start.elapsed()
-    }
-}
-
 impl Drop for PausedTimer<'_> {
     fn drop(&mut self) {
-        let elapsed = self.elapsed();
-        self.timer.frame_start += elapsed;
+        self.timer.frame_start += self.start.elapsed();
     }
 }
 

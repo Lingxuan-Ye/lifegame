@@ -1,7 +1,4 @@
-use crate::bounded::Bounded;
 use crate::filter::{Bit, Block, Dye, Emoji, Filter, Hanzi};
-use crate::genesis::Density;
-use crate::tui::FpsMax;
 use clap::{Arg, ArgAction, ArgMatches, ValueEnum, command, value_parser};
 use crossterm::style::Color;
 use std::sync::LazyLock;
@@ -33,10 +30,7 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("DECIMAL")
                 .value_parser(value_parser!(f64))
                 .default_value("0.5")
-                .help(format!(
-                    "Initial population density (use default if out of range {:?})",
-                    Density::RANGE
-                )),
+                .help("Initial population density (use default if out of range [0.0, 1.0])"),
             Arg::new("filter")
                 .long("filter")
                 .value_name("FILTER")
@@ -77,10 +71,7 @@ static MATCHES: LazyLock<ArgMatches> = LazyLock::new(|| {
                 .value_name("DECIMAL")
                 .value_parser(value_parser!(f64))
                 .default_value("60.0")
-                .help(format!(
-                    "Maximum fps (use default if out of range {:?})",
-                    FpsMax::RANGE
-                )),
+                .help("Maximum fps (use default if out of range [0.0, inf))"),
             Arg::new("show-stats")
                 .long("show-stats")
                 .action(ArgAction::SetTrue)
@@ -93,9 +84,9 @@ pub struct Args {
     pub nrows: usize,
     pub ncols: usize,
     pub seed: Option<&'static str>,
-    pub density: Density,
+    pub density: f64,
     pub filter: Box<dyn Filter>,
-    pub fps_max: FpsMax,
+    pub fps_max: f64,
     pub show_stats: bool,
 }
 
@@ -109,16 +100,9 @@ impl Args {
         let fps_max = MATCHES.get_one("fps-max").copied().unwrap();
         let show_stats = MATCHES.get_flag("show-stats");
 
-        let density = Density::new_or_default(density);
         let filter: Box<dyn Filter> = match filter {
-            FilterKind::Bit => {
-                let filter = Bit;
-                Box::new(filter)
-            }
-            FilterKind::Block => {
-                let filter = Block;
-                Box::new(filter)
-            }
+            FilterKind::Bit => Box::new(Bit),
+            FilterKind::Block => Box::new(Block),
             FilterKind::Dye => {
                 let color_dead = MATCHES
                     .get_one::<ColorKind>("color-dead")
@@ -130,19 +114,11 @@ impl Args {
                     .copied()
                     .unwrap()
                     .into();
-                let filter = Dye::new(color_dead, color_alive);
-                Box::new(filter)
+                Box::new(Dye::new(color_dead, color_alive))
             }
-            FilterKind::Emoji => {
-                let filter = Emoji::random();
-                Box::new(filter)
-            }
-            FilterKind::Hanzi => {
-                let filter = Hanzi;
-                Box::new(filter)
-            }
+            FilterKind::Emoji => Box::new(Emoji::random()),
+            FilterKind::Hanzi => Box::new(Hanzi),
         };
-        let fps_max = FpsMax::new_or_default(fps_max);
 
         Self {
             nrows,

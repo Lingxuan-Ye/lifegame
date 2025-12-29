@@ -33,11 +33,11 @@ pub fn setup_listener() {
                 'k' => {
                     TIME_SCALE.decrement();
                 }
-                'r' => {
-                    RESET.set();
-                }
                 'p' => {
                     PAUSE.toggle();
+                }
+                'r' => {
+                    RESET.set();
                 }
                 'q' => {
                     PAUSE.unset();
