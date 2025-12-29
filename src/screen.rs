@@ -11,7 +11,7 @@ use std::io::Write;
 use std::time::{Duration, Instant};
 
 #[derive(Debug)]
-pub struct Tui<F, O>
+pub struct Screen<F, O>
 where
     F: Filter,
     O: Write,
@@ -26,7 +26,7 @@ where
     output: O,
 }
 
-impl<F, O> Tui<F, O>
+impl<F, O> Screen<F, O>
 where
     F: Filter,
     O: Write,
@@ -201,7 +201,7 @@ where
     }
 }
 
-impl<F, O> Drop for Tui<F, O>
+impl<F, O> Drop for Screen<F, O>
 where
     F: Filter,
     O: Write,

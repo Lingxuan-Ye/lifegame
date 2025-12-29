@@ -1,7 +1,7 @@
 use self::cli::Args;
 use self::genesis::Genesis;
+use self::screen::Screen;
 use self::signal::setup_listener;
-use self::tui::Tui;
 use anyhow::Result;
 use eoe::QuitOnError;
 use matreex::Shape;
@@ -11,8 +11,8 @@ mod biosquare;
 mod cli;
 mod filter;
 mod genesis;
+mod screen;
 mod signal;
-mod tui;
 
 fn run() -> Result<()> {
     setup_listener();
@@ -22,7 +22,7 @@ fn run() -> Result<()> {
     let genesis = Genesis::new(shape).random(args.density, args.seed)?;
     let output = stdout().lock();
 
-    Tui::new(genesis, args.fps_max, args.show_stats, args.filter, output)?.run()?;
+    Screen::new(genesis, args.fps_max, args.show_stats, args.filter, output)?.run()?;
 
     Ok(())
 }
