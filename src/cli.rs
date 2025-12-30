@@ -1,4 +1,6 @@
 use crate::filter::{Bit, Block, Dye, Emoji, Filter, Hanzi};
+use crate::genesis::Density;
+use crate::screen::FpsMax;
 use clap::{Arg, ArgAction, ArgMatches, ValueEnum, command, value_parser};
 use crossterm::style::Color;
 use std::sync::LazyLock;
@@ -84,9 +86,9 @@ pub struct Args {
     pub nrows: usize,
     pub ncols: usize,
     pub seed: Option<&'static str>,
-    pub density: f64,
+    pub density: Density,
     pub filter: Box<dyn Filter>,
-    pub fps_max: f64,
+    pub fps_max: FpsMax,
     pub show_stats: bool,
 }
 
@@ -100,6 +102,7 @@ impl Args {
         let fps_max = MATCHES.get_one("fps-max").copied().unwrap();
         let show_stats = MATCHES.get_flag("show-stats");
 
+        let density = Density::new(density).or(Density::new(0.5)).unwrap();
         let filter: Box<dyn Filter> = match filter {
             FilterKind::Bit => Box::new(Bit),
             FilterKind::Block => Box::new(Block),
@@ -119,6 +122,7 @@ impl Args {
             FilterKind::Emoji => Box::new(Emoji::random()),
             FilterKind::Hanzi => Box::new(Hanzi),
         };
+        let fps_max = FpsMax::new(fps_max).or(FpsMax::new(60.0)).unwrap();
 
         Self {
             nrows,
