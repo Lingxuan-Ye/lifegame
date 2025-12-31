@@ -1,8 +1,10 @@
 use crossterm::event::{Event, KeyCode, KeyModifiers, read};
 use eoe::QuitOnError;
-use std::sync::atomic::{AtomicBool, AtomicI8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI8, Ordering::Relaxed};
 use std::sync::{Condvar, Mutex, MutexGuard, Once};
 use std::thread;
+
+pub static LISTENER: Listener = Listener::new();
 
 pub static TIME_SCALE: TimeScale = TimeScale::new();
 pub static PAUSE: Pause = Pause::new();
@@ -10,57 +12,64 @@ pub static FLIP: Flip = Flip::new();
 pub static RESET: Reset = Reset::new();
 pub static QUIT: Quit = Quit::new();
 
-static LISTENER: Once = Once::new();
+#[derive(Debug)]
+pub struct Listener(Once);
 
-pub fn setup_listener() {
-    let handler = || {
-        loop {
-            let event = read().quit_on_error();
+impl Listener {
+    const fn new() -> Self {
+        Self(Once::new())
+    }
 
-            let Event::Key(key_event) = event else {
-                continue;
-            };
-            if !key_event.is_press() {
-                continue;
+    pub fn setup(&self) {
+        let handler = || {
+            loop {
+                let event = read().quit_on_error();
+
+                let Event::Key(key_event) = event else {
+                    continue;
+                };
+                if !key_event.is_press() {
+                    continue;
+                }
+                let KeyCode::Char(key) = key_event.code else {
+                    continue;
+                };
+
+                match key.to_ascii_lowercase() {
+                    'j' => {
+                        TIME_SCALE.increment();
+                    }
+                    'k' => {
+                        TIME_SCALE.decrement();
+                    }
+                    'p' => {
+                        PAUSE.toggle();
+                    }
+                    'f' => {
+                        FLIP.set();
+                    }
+                    'r' => {
+                        RESET.set();
+                    }
+                    'q' => {
+                        PAUSE.unset();
+                        QUIT.set();
+                        break;
+                    }
+                    'c' if key_event.modifiers == KeyModifiers::CONTROL => {
+                        PAUSE.unset();
+                        QUIT.set();
+                        break;
+                    }
+                    _ => (),
+                }
             }
-            let KeyCode::Char(key) = key_event.code else {
-                continue;
-            };
+        };
 
-            match key.to_ascii_lowercase() {
-                'j' => {
-                    TIME_SCALE.increment();
-                }
-                'k' => {
-                    TIME_SCALE.decrement();
-                }
-                'p' => {
-                    PAUSE.toggle();
-                }
-                'f' => {
-                    FLIP.set();
-                }
-                'r' => {
-                    RESET.set();
-                }
-                'q' => {
-                    PAUSE.unset();
-                    QUIT.set();
-                    break;
-                }
-                'c' if key_event.modifiers == KeyModifiers::CONTROL => {
-                    PAUSE.unset();
-                    QUIT.set();
-                    break;
-                }
-                _ => (),
-            }
-        }
-    };
-
-    LISTENER.call_once(|| {
-        thread::spawn(handler);
-    })
+        self.0.call_once(|| {
+            thread::spawn(handler);
+        })
+    }
 }
 
 #[derive(Debug)]
@@ -78,19 +87,27 @@ impl TimeScale {
     }
 
     fn increment(&self) {
-        if self.exponent.load(Ordering::Relaxed) < Self::MAX_EXPONENT {
-            self.exponent.fetch_add(1, Ordering::Relaxed);
-        }
+        let _ = self.exponent.fetch_update(Relaxed, Relaxed, |exponent| {
+            if exponent < Self::MAX_EXPONENT {
+                Some(exponent + 1)
+            } else {
+                None
+            }
+        });
     }
 
     fn decrement(&self) {
-        if self.exponent.load(Ordering::Relaxed) > Self::MIN_EXPONENT {
-            self.exponent.fetch_sub(1, Ordering::Relaxed);
-        }
+        let _ = self.exponent.fetch_update(Relaxed, Relaxed, |exponent| {
+            if exponent > Self::MIN_EXPONENT {
+                Some(exponent - 1)
+            } else {
+                None
+            }
+        });
     }
 
     pub fn scale(&self) -> f64 {
-        let exponent = self.exponent.load(Ordering::Relaxed) as f64;
+        let exponent = self.exponent.load(Relaxed) as f64;
         exponent.exp2()
     }
 }
@@ -153,11 +170,11 @@ impl Flip {
     }
 
     fn set(&self) {
-        self.state.store(true, Ordering::Relaxed);
+        self.state.store(true, Relaxed);
     }
 
     pub fn take(&self) -> bool {
-        self.state.swap(false, Ordering::Relaxed)
+        self.state.swap(false, Relaxed)
     }
 }
 
@@ -173,11 +190,11 @@ impl Reset {
     }
 
     fn set(&self) {
-        self.state.store(true, Ordering::Relaxed);
+        self.state.store(true, Relaxed);
     }
 
     pub fn take(&self) -> bool {
-        self.state.swap(false, Ordering::Relaxed)
+        self.state.swap(false, Relaxed)
     }
 }
 
@@ -193,10 +210,10 @@ impl Quit {
     }
 
     fn set(&self) {
-        self.state.store(true, Ordering::Relaxed);
+        self.state.store(true, Relaxed);
     }
 
     pub fn get(&self) -> bool {
-        self.state.load(Ordering::Relaxed)
+        self.state.load(Relaxed)
     }
 }

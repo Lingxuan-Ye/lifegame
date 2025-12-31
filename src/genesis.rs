@@ -16,17 +16,25 @@ impl Genesis {
         Self { shape }
     }
 
-    pub fn random<S>(&self, density: f64, seed: Option<S>) -> Result<Matrix<Cell>>
+    pub fn random<S>(&self, density: Density, seed: Option<S>) -> Result<Matrix<Cell>>
     where
         S: Hash,
     {
-        let density = if (0.0..=1.0).contains(&density) {
-            density
-        } else {
-            0.5
-        };
         let mut rng = Seeder::from(seed).into_rng::<ChaCha8Rng>();
-        Matrix::with_initializer(self.shape, |_| Cell::from(rng.random_bool(density)))
+        Matrix::with_initializer(self.shape, |_| Cell::from(rng.random_bool(density.0)))
             .map_err(Into::into)
+    }
+}
+
+#[derive(Debug)]
+pub struct Density(f64);
+
+impl Density {
+    pub fn new(value: f64) -> Option<Self> {
+        if (0.0..=1.0).contains(&value) {
+            Some(Self(value))
+        } else {
+            None
+        }
     }
 }

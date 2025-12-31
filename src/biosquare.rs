@@ -73,7 +73,7 @@ impl BioSquare {
     where
         R: Rng,
     {
-        const FLIP_RATE: f64 = 0.1;
+        const FLIP_RATE: f64 = 0.01;
 
         for cell in self.current.iter_elements_mut() {
             if rng.random_bool(FLIP_RATE) {

@@ -18,7 +18,7 @@ where
 {
     biosquare: BioSquare,
     genesis: Matrix<Cell>,
-    fps_max: f64,
+    fps_max: FpsMax,
     show_stats: bool,
     timer: Timer,
     rng: ThreadRng,
@@ -33,13 +33,12 @@ where
 {
     pub fn new(
         genesis: Matrix<Cell>,
-        fps_max: f64,
+        fps_max: FpsMax,
         show_stats: bool,
         filter: F,
         output: O,
     ) -> Result<Self> {
         let biosquare = BioSquare::new(genesis.clone());
-        let fps_max = if fps_max >= 0.0 { fps_max } else { 60.0 };
         let timer = Timer::start();
         let rng = rand::rng();
 
@@ -173,7 +172,7 @@ where
     }
 
     fn frame_duration_min(&self) -> f64 {
-        signal::TIME_SCALE.scale() / self.fps_max
+        signal::TIME_SCALE.scale() / self.fps_max.0
     }
 
     fn enter_alternate_screen(&mut self) -> Result<()> {
@@ -208,6 +207,19 @@ where
 {
     fn drop(&mut self) {
         self.leave_alternate_screen().quit_on_error();
+    }
+}
+
+#[derive(Debug)]
+pub struct FpsMax(f64);
+
+impl FpsMax {
+    pub fn new(value: f64) -> Option<Self> {
+        if value >= 0.0 {
+            Some(Self(value))
+        } else {
+            None
+        }
     }
 }
 

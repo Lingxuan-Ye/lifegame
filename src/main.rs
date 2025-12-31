@@ -1,7 +1,7 @@
 use self::cli::Args;
 use self::genesis::Genesis;
 use self::screen::Screen;
-use self::signal::setup_listener;
+use self::signal::LISTENER;
 use anyhow::Result;
 use eoe::QuitOnError;
 use matreex::Shape;
@@ -15,7 +15,7 @@ mod screen;
 mod signal;
 
 fn run() -> Result<()> {
-    setup_listener();
+    LISTENER.setup();
 
     let args = Args::parse();
     let shape = Shape::new(args.nrows, args.ncols);
