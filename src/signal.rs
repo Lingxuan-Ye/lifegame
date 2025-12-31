@@ -4,63 +4,72 @@ use std::sync::atomic::{AtomicBool, AtomicI8, Ordering::Relaxed};
 use std::sync::{Condvar, Mutex, MutexGuard, Once};
 use std::thread;
 
+pub static LISTENER: Listener = Listener::new();
+
 pub static TIME_SCALE: TimeScale = TimeScale::new();
 pub static PAUSE: Pause = Pause::new();
 pub static FLIP: Flip = Flip::new();
 pub static RESET: Reset = Reset::new();
 pub static QUIT: Quit = Quit::new();
 
-static LISTENER: Once = Once::new();
+#[derive(Debug)]
+pub struct Listener(Once);
 
-pub fn setup_listener() {
-    let handler = || {
-        loop {
-            let event = read().quit_on_error();
+impl Listener {
+    const fn new() -> Self {
+        Self(Once::new())
+    }
 
-            let Event::Key(key_event) = event else {
-                continue;
-            };
-            if !key_event.is_press() {
-                continue;
+    pub fn setup(&self) {
+        let handler = || {
+            loop {
+                let event = read().quit_on_error();
+
+                let Event::Key(key_event) = event else {
+                    continue;
+                };
+                if !key_event.is_press() {
+                    continue;
+                }
+                let KeyCode::Char(key) = key_event.code else {
+                    continue;
+                };
+
+                match key.to_ascii_lowercase() {
+                    'j' => {
+                        TIME_SCALE.increment();
+                    }
+                    'k' => {
+                        TIME_SCALE.decrement();
+                    }
+                    'p' => {
+                        PAUSE.toggle();
+                    }
+                    'f' => {
+                        FLIP.set();
+                    }
+                    'r' => {
+                        RESET.set();
+                    }
+                    'q' => {
+                        PAUSE.unset();
+                        QUIT.set();
+                        break;
+                    }
+                    'c' if key_event.modifiers == KeyModifiers::CONTROL => {
+                        PAUSE.unset();
+                        QUIT.set();
+                        break;
+                    }
+                    _ => (),
+                }
             }
-            let KeyCode::Char(key) = key_event.code else {
-                continue;
-            };
+        };
 
-            match key.to_ascii_lowercase() {
-                'j' => {
-                    TIME_SCALE.increment();
-                }
-                'k' => {
-                    TIME_SCALE.decrement();
-                }
-                'p' => {
-                    PAUSE.toggle();
-                }
-                'f' => {
-                    FLIP.set();
-                }
-                'r' => {
-                    RESET.set();
-                }
-                'q' => {
-                    PAUSE.unset();
-                    QUIT.set();
-                    break;
-                }
-                'c' if key_event.modifiers == KeyModifiers::CONTROL => {
-                    PAUSE.unset();
-                    QUIT.set();
-                    break;
-                }
-                _ => (),
-            }
-        }
-    };
-
-    LISTENER.call_once(|| {
-        thread::spawn(handler);
-    })
+        self.0.call_once(|| {
+            thread::spawn(handler);
+        })
+    }
 }
 
 #[derive(Debug)]
