@@ -78,15 +78,27 @@ impl TimeScale {
     }
 
     fn increment(&self) {
-        if self.exponent.load(Ordering::Relaxed) < Self::MAX_EXPONENT {
-            self.exponent.fetch_add(1, Ordering::Relaxed);
-        }
+        let _ = self
+            .exponent
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |exponent| {
+                if exponent < Self::MAX_EXPONENT {
+                    Some(exponent + 1)
+                } else {
+                    None
+                }
+            });
     }
 
     fn decrement(&self) {
-        if self.exponent.load(Ordering::Relaxed) > Self::MIN_EXPONENT {
-            self.exponent.fetch_sub(1, Ordering::Relaxed);
-        }
+        let _ = self
+            .exponent
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |exponent| {
+                if exponent > Self::MIN_EXPONENT {
+                    Some(exponent - 1)
+                } else {
+                    None
+                }
+            });
     }
 
     pub fn scale(&self) -> f64 {
