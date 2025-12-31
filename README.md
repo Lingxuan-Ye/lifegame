@@ -39,11 +39,11 @@ lifegame --help
 
 ## Keymap
 
-| Key | Action             |
-| --- | ------------------ |
-| `j` | Slow down by half  |
-| `k` | Speed up by twice  |
-| `p` | Toggle pause       |
-| `f` | Random flip by 10% |
-| `r` | Reset world        |
-| `q` | Quit the game      |
+| Key | Action            |
+| --- | ----------------- |
+| `j` | Slow down by half |
+| `k` | Speed up by twice |
+| `p` | Toggle pause      |
+| `f` | Random flip by 1% |
+| `r` | Reset world       |
+| `q` | Quit the game     |
