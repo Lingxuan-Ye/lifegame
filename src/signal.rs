@@ -1,6 +1,6 @@
 use crossterm::event::{Event, KeyCode, KeyModifiers, read};
 use eoe::QuitOnError;
-use std::sync::atomic::{AtomicBool, AtomicI8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI8, Ordering::Relaxed};
 use std::sync::{Condvar, Mutex, MutexGuard, Once};
 use std::thread;
 
@@ -78,31 +78,27 @@ impl TimeScale {
     }
 
     fn increment(&self) {
-        let _ = self
-            .exponent
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |exponent| {
-                if exponent < Self::MAX_EXPONENT {
-                    Some(exponent + 1)
-                } else {
-                    None
-                }
-            });
+        let _ = self.exponent.fetch_update(Relaxed, Relaxed, |exponent| {
+            if exponent < Self::MAX_EXPONENT {
+                Some(exponent + 1)
+            } else {
+                None
+            }
+        });
     }
 
     fn decrement(&self) {
-        let _ = self
-            .exponent
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |exponent| {
-                if exponent > Self::MIN_EXPONENT {
-                    Some(exponent - 1)
-                } else {
-                    None
-                }
-            });
+        let _ = self.exponent.fetch_update(Relaxed, Relaxed, |exponent| {
+            if exponent > Self::MIN_EXPONENT {
+                Some(exponent - 1)
+            } else {
+                None
+            }
+        });
     }
 
     pub fn scale(&self) -> f64 {
-        let exponent = self.exponent.load(Ordering::Relaxed) as f64;
+        let exponent = self.exponent.load(Relaxed) as f64;
         exponent.exp2()
     }
 }
@@ -165,11 +161,11 @@ impl Flip {
     }
 
     fn set(&self) {
-        self.state.store(true, Ordering::Relaxed);
+        self.state.store(true, Relaxed);
     }
 
     pub fn take(&self) -> bool {
-        self.state.swap(false, Ordering::Relaxed)
+        self.state.swap(false, Relaxed)
     }
 }
 
@@ -185,11 +181,11 @@ impl Reset {
     }
 
     fn set(&self) {
-        self.state.store(true, Ordering::Relaxed);
+        self.state.store(true, Relaxed);
     }
 
     pub fn take(&self) -> bool {
-        self.state.swap(false, Ordering::Relaxed)
+        self.state.swap(false, Relaxed)
     }
 }
 
@@ -205,10 +201,10 @@ impl Quit {
     }
 
     fn set(&self) {
-        self.state.store(true, Ordering::Relaxed);
+        self.state.store(true, Relaxed);
     }
 
     pub fn get(&self) -> bool {
-        self.state.load(Ordering::Relaxed)
+        self.state.load(Relaxed)
     }
 }
