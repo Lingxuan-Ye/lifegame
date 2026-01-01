@@ -21,8 +21,7 @@ impl Genesis {
         S: Hash,
     {
         let mut rng = Seeder::from(seed).into_rng::<ChaCha8Rng>();
-        Matrix::with_initializer(self.shape, |_| Cell::from(rng.random_bool(density.0)))
-            .map_err(Into::into)
+        Matrix::from_fn(self.shape, |_| Cell::from(rng.random_bool(density.0))).map_err(Into::into)
     }
 }
 
