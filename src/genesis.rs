@@ -1,7 +1,7 @@
 use crate::biosquare::Cell;
 use anyhow::Result;
 use matreex::{Matrix, Shape};
-use rand::Rng;
+use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use rand_seeder::Seeder;
 use std::hash::Hash;
@@ -20,7 +20,10 @@ impl Genesis {
     where
         S: Hash,
     {
-        let mut rng = Seeder::from(seed).into_rng::<ChaCha8Rng>();
+        let mut rng = match seed {
+            None => ChaCha8Rng::try_from_os_rng()?,
+            Some(seed) => Seeder::from(seed).into_rng(),
+        };
         Matrix::from_fn(self.shape, |_| Cell::from(rng.random_bool(density.0))).map_err(Into::into)
     }
 }
