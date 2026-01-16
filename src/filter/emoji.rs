@@ -26,7 +26,7 @@ impl Emoji {
         let len = slice.chars().count();
         let index = rng.random_range(..len);
         let mut iter = slice.char_indices().skip(index).map(|(index, _)| index);
-        let lower = iter.next().unwrap();
+        let lower = iter.next().unwrap_or_else(|| unreachable!());
         let upper = iter.next().unwrap_or(slice.len());
         &slice[lower..upper]
     }

@@ -94,15 +94,32 @@ pub struct Args {
 
 impl Args {
     pub fn parse() -> Self {
-        let nrows = MATCHES.get_one("nrows").copied().unwrap();
-        let ncols = MATCHES.get_one("ncols").copied().unwrap();
+        let nrows = MATCHES
+            .get_one("nrows")
+            .copied()
+            .unwrap_or_else(|| unreachable!());
+        let ncols = MATCHES
+            .get_one("ncols")
+            .copied()
+            .unwrap_or_else(|| unreachable!());
         let seed = MATCHES.get_one("seed").map(String::as_ref);
-        let density = MATCHES.get_one("density").copied().unwrap();
-        let filter = MATCHES.get_one("filter").copied().unwrap();
-        let fps_max = MATCHES.get_one("fps-max").copied().unwrap();
+        let density = MATCHES
+            .get_one("density")
+            .copied()
+            .unwrap_or_else(|| unreachable!());
+        let filter = MATCHES
+            .get_one("filter")
+            .copied()
+            .unwrap_or_else(|| unreachable!());
+        let fps_max = MATCHES
+            .get_one("fps-max")
+            .copied()
+            .unwrap_or_else(|| unreachable!());
         let show_stats = MATCHES.get_flag("show-stats");
 
-        let density = Density::new(density).or(Density::new(0.5)).unwrap();
+        let density = Density::new(density)
+            .or(Density::new(0.5))
+            .unwrap_or_else(|| unreachable!());
         let filter: Box<dyn Filter> = match filter {
             FilterKind::Bit => Box::new(Bit),
             FilterKind::Block => Box::new(Block),
@@ -110,19 +127,21 @@ impl Args {
                 let color_dead = MATCHES
                     .get_one::<ColorKind>("color-dead")
                     .copied()
-                    .unwrap()
+                    .unwrap_or_else(|| unreachable!())
                     .into();
                 let color_alive = MATCHES
                     .get_one::<ColorKind>("color-alive")
                     .copied()
-                    .unwrap()
+                    .unwrap_or_else(|| unreachable!())
                     .into();
                 Box::new(Dye::new(color_dead, color_alive))
             }
             FilterKind::Emoji => Box::new(Emoji::random()),
             FilterKind::Hanzi => Box::new(Hanzi),
         };
-        let fps_max = FpsMax::new(fps_max).or(FpsMax::new(60.0)).unwrap();
+        let fps_max = FpsMax::new(fps_max)
+            .or(FpsMax::new(60.0))
+            .unwrap_or_else(|| unreachable!());
 
         Self {
             nrows,
