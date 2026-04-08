@@ -8,8 +8,8 @@ pub enum Cell {
 }
 
 impl Cell {
-    pub fn is_alive(&self) -> bool {
-        *self == Self::Alive
+    pub fn is_alive(self) -> bool {
+        self == Self::Alive
     }
 
     pub fn die(&mut self) {

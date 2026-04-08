@@ -125,24 +125,24 @@ where
         let fps = 1.0 / self.timer.last_frame().as_secs_f64();
         let runtime = self.timer.global();
 
-        self.render_measurement("Generation", format!("{generation}"))?
-            .render_measurement("Population", format!("{population}"))?
-            .render_measurement("Density", format!("{:.2} %", density * 100.0))?
-            .render_measurement("FPS", format!("{fps:.2}"))?
-            .render_measurement("Runtime", fmt_duration(runtime))?;
+        self.render_measurement("Generation", &format!("{generation}"))?
+            .render_measurement("Population", &format!("{population}"))?
+            .render_measurement("Density", &format!("{:.2} %", density * 100.0))?
+            .render_measurement("FPS", &format!("{fps:.2}"))?
+            .render_measurement("Runtime", &fmt_duration(runtime))?;
 
         Ok(())
     }
 
     /// # Notes
     ///
-    /// `value` is a `String` rather than a generic `T: Display` because not
-    /// all `T`s support alignment. However, this introduces a small overhead
-    /// due to formatting it twice.
+    /// `value` is a `&str` rather than a generic `T: Display` because not all
+    /// `T`s support alignment. However, this introduces a small overhead due
+    /// to formatting it twice.
     ///
     /// Additionally, `key` and `value` should avoid containing full-width or
     /// non-printable characters, or the alignment will be incorrect.
-    fn render_measurement(&mut self, key: &str, value: String) -> Result<&mut Self> {
+    fn render_measurement(&mut self, key: &str, value: &str) -> Result<&mut Self> {
         const KEY_WIDTH: usize = 20;
         const VALUE_WIDTH: usize = 40;
 
@@ -210,7 +210,7 @@ where
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct FpsMax(f64);
 
 impl FpsMax {

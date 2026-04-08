@@ -68,7 +68,7 @@ impl Listener {
 
         self.0.call_once(|| {
             thread::spawn(handler);
-        })
+        });
     }
 }
 

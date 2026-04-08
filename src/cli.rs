@@ -195,13 +195,16 @@ trait ValueEnumExt: ValueEnum {
     fn help(description: &str, default: Option<Self>) -> String {
         let mut message = description.to_string();
         if let Some(default) = default.and_then(|variant| variant.to_possible_value()) {
-            message.push_str(&format!(" [default: {}]", default.get_name()));
+            message.push_str(" [default: ");
+            message.push_str(default.get_name());
+            message.push(']');
         }
         Self::value_variants()
             .iter()
-            .filter_map(|variant| variant.to_possible_value())
+            .filter_map(ValueEnum::to_possible_value)
             .for_each(|entry| {
-                message.push_str(&format!("\n- {}", entry.get_name()));
+                message.push_str("\n- ");
+                message.push_str(entry.get_name());
             });
         message
     }

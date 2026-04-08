@@ -28,7 +28,7 @@ impl Genesis {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Density(f64);
 
 impl Density {
