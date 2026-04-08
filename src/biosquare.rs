@@ -1,5 +1,5 @@
 use matreex::{Matrix, WrappingIndex};
-use rand::Rng;
+use rand::RngExt;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
@@ -71,7 +71,7 @@ impl BioSquare {
 
     pub fn random_flip<R>(&mut self, rng: &mut R)
     where
-        R: Rng,
+        R: RngExt,
     {
         const FLIP_RATE: f64 = 0.01;
 

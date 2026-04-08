@@ -1,6 +1,6 @@
 use super::Filter;
 use crate::biosquare::Cell;
-use rand::Rng;
+use rand::RngExt;
 
 const DEAD_SYMBOLS: &str = "🤢🥶🥵😡🤬😈👿🤡👻";
 const ALIVE_SYMBOLS: &str = "🤣😊🥰😍🤗🤭😋🤤😤";
@@ -21,7 +21,7 @@ impl Emoji {
 
     fn random_char<'a, R>(slice: &'a str, rng: &mut R) -> &'a str
     where
-        R: Rng,
+        R: RngExt,
     {
         let len = slice.chars().count();
         let index = rng.random_range(..len);
