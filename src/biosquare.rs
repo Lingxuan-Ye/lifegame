@@ -1,5 +1,5 @@
 use matreex::{Matrix, WrappingIndex};
-use rand::Rng;
+use rand::RngExt;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
@@ -8,8 +8,8 @@ pub enum Cell {
 }
 
 impl Cell {
-    pub fn is_alive(&self) -> bool {
-        *self == Self::Alive
+    pub fn is_alive(self) -> bool {
+        self == Self::Alive
     }
 
     pub fn die(&mut self) {
@@ -71,7 +71,7 @@ impl BioSquare {
 
     pub fn random_flip<R>(&mut self, rng: &mut R)
     where
-        R: Rng,
+        R: RngExt,
     {
         const FLIP_RATE: f64 = 0.01;
 
