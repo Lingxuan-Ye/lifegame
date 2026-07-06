@@ -1,7 +1,7 @@
 use matreex::{Matrix, WrappingIndex};
 use rand::RngExt;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Cell {
     Dead,
     Alive,
